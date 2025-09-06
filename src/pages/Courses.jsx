@@ -51,9 +51,9 @@ function Courses() {
         <Sidebar />
 
         {/* Main Content */}
-        <main className="flex-1 ml-56 p-6">
+        <main className="flex-1 lg:ml-56 p-4 lg:p-6">
           {/* Header */}
-          <div className="flex justify-between items-center mb-6">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
             <div>
               <h1 className="text-xl font-semibold text-white mb-1">Courses</h1>
               <p className="text-sm text-gray-400">Manage your courses and track performance</p>
@@ -104,7 +104,7 @@ function Courses() {
           </div>
 
           {/* Courses Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
             {filteredCourses.map(course => (
               <div key={course.id} className="bg-gray-800 rounded-lg overflow-hidden border border-gray-800 hover:border-gray-600 transition-colors">
                 <div className="relative h-48">

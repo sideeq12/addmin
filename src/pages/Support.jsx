@@ -18,15 +18,15 @@ function Support() {
         <Sidebar />
 
         {/* Main Content */}
-        <main className="flex-1 ml-56 p-6">
+        <main className="flex-1 lg:ml-56 p-4 lg:p-6">
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-white mb-2">Contact Support</h1>
             <p className="text-base text-gray-400">Get help from our support team</p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
             {/* Support Form */}
-            <div className="lg:col-span-2">
+            <div className="order-2 lg:order-1 lg:col-span-2">
               <div className="bg-gray-800 p-6 rounded-lg border border-gray-800">
                 <h3 className="text-xl font-semibold text-white mb-6">Submit a Support Request</h3>
                 
@@ -81,7 +81,7 @@ function Support() {
             </div>
 
             {/* Support Info */}
-            <div className="space-y-6">
+            <div className="order-1 lg:order-2 space-y-4 lg:space-y-6">
               {/* Contact Information */}
               <div className="bg-gray-800 p-6 rounded-lg border border-gray-800">
                 <h3 className="text-lg font-semibold text-white mb-4">Contact Information</h3>

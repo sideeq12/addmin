@@ -182,7 +182,7 @@ function CreateCourse() {
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">Category *</label>
                 <select
@@ -270,7 +270,7 @@ function CreateCourse() {
                     </h5>
                     {section.videos.map((video, videoIndex) => (
                       <div key={video.id} className="bg-gray-900/50 p-4 rounded-lg mb-3 border border-gray-800">
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 items-end">
                           <div>
                             <label className="block text-xs text-gray-400 mb-2">Lesson Title</label>
                             <input
@@ -505,7 +505,7 @@ function CreateCourse() {
               <p className="text-gray-400">Set your course price and important details</p>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">Course Price (₦) *</label>
                 <input
@@ -648,7 +648,7 @@ function CreateCourse() {
       <div className="flex">
         <Sidebar />
 
-        <main className="flex-1 ml-56 p-6">
+        <main className="flex-1 lg:ml-56 p-4 lg:p-6">
           <div className="max-w-4xl">
             {/* Header */}
             <div className="mb-8">
@@ -700,7 +700,7 @@ function CreateCourse() {
               {renderStepContent()}
 
               {/* Navigation Buttons */}
-              <div className="flex justify-between items-center mt-8 pt-6 border-t border-gray-800">
+              <div className="flex flex-col sm:flex-row justify-between items-center gap-4 sm:gap-0 mt-8 pt-6 border-t border-gray-800">
                 <button
                   type="button"
                   onClick={handlePrevious}
@@ -710,7 +710,7 @@ function CreateCourse() {
                   Previous
                 </button>
 
-                <div className="flex space-x-4">
+                <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 w-full sm:w-auto">
                   <button
                     type="button"
                     onClick={() => navigate('/courses')}

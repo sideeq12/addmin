@@ -7,7 +7,7 @@ function Analytics() {
         <Sidebar />
 
         {/* Main Content */}
-        <main className="flex-1 ml-56 p-6">
+        <main className="flex-1 lg:ml-56 p-4 lg:p-6">
           {/* Header */}
           <div className="mb-6">
             <h1 className="text-xl font-semibold text-white mb-1">Analytics</h1>
@@ -22,7 +22,7 @@ function Analytics() {
           </div>
 
           {/* Key Metrics */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
             <div className="bg-gray-800 p-4 rounded border border-gray-800">
               <div className="flex items-center justify-between mb-2">
                 <div>
@@ -86,7 +86,7 @@ function Analytics() {
           </div>
 
           {/* Charts Section */}
-          <div className="grid grid-cols-1 lg:w-full gap-8 mb-8">
+          <div className="grid grid-cols-1 gap-6 lg:gap-8 mb-8">
             {/* Course Performance Chart */}
             <div className="bg-gray-800 p-6 rounded-lg border border-gray-800">
               <h3 className="text-xl font-semibold text-white mb-6">Course Performance</h3>

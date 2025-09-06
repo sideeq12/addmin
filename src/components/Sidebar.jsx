@@ -1,12 +1,40 @@
 import { Link, useLocation } from 'react-router-dom'
+import { useState } from 'react'
 
 function Sidebar() {
   const location = useLocation()
+  const [isOpen, setIsOpen] = useState(false)
 
   const isActive = (path) => location.pathname === path
 
   return (
-    <aside className="fixed w-56 bg-black border border-gray-800 min-h-screen p-4 border-r border-gray-800 shadow-xl">
+    <>
+      {/* Mobile menu button */}
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="fixed top-4 left-4 z-50 lg:hidden bg-gray-800 hover:bg-gray-700 text-white p-2 rounded-lg shadow-lg transition-colors"
+      >
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          {isOpen ? (
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          ) : (
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+          )}
+        </svg>
+      </button>
+
+      {/* Mobile overlay */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+          onClick={() => setIsOpen(false)}
+        />
+      )}
+
+      {/* Sidebar */}
+      <aside className={`fixed w-56 bg-black border border-gray-800 min-h-screen p-4 border-r border-gray-800 shadow-xl z-50 transition-transform duration-300 ${
+        isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+      }`}>
       <div className="mb-8">
         <Link to="/" className="text-xl font-bold text-blue-400 hover:text-blue-300 transition-colors">
           Scholarbase
