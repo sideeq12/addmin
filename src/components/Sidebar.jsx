@@ -1,9 +1,17 @@
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
+import { useAuth } from '../contexts/AuthContext'
 
 function Sidebar() {
   const location = useLocation()
+  const navigate = useNavigate()
+  const { user, logout } = useAuth()
   const [isOpen, setIsOpen] = useState(false)
+
+  const handleLogout = () => {
+    logout()
+    navigate('/')
+  }
 
   const isActive = (path) => location.pathname === path
 
@@ -133,19 +141,25 @@ function Sidebar() {
         <div className="bg-gray-800 p-4 rounded-lg border border-gray-600">
           <div className="flex items-center space-x-3 mb-3">
             <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-semibold">
-              JD
+              {user?.first_name?.[0]}{user?.last_name?.[0]}
             </div>
             <div>
-              <p className="text-white font-medium">John Doe</p>
-              <p className="text-gray-400 text-sm">Mathematics Tutor</p>
+              <p className="text-white font-medium">
+                {user?.display_name || `${user?.first_name} ${user?.last_name}`}
+              </p>
+              <p className="text-gray-400 text-sm">{user?.expertise || 'Tutor'}</p>
             </div>
           </div>
-          <Link to="/" className="text-blue-400 text-sm hover:text-blue-300 transition-colors font-medium">
+          <button 
+            onClick={handleLogout}
+            className="text-blue-400 text-sm hover:text-blue-300 transition-colors font-medium"
+          >
             → Logout
-          </Link>
+          </button>
         </div>
       </div>
     </aside>
+    </>
   )
 }
 

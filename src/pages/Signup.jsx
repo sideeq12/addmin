@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { useAuth } from '../contexts/AuthContext'
 import {
   Select,
   SelectContent,
@@ -10,7 +11,10 @@ import {
 
 function Signup() {
   const [currentStep, setCurrentStep] = useState(1)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
   const navigate = useNavigate()
+  const { signup } = useAuth()
   
   const subjectOptions = [
     { value: 'Mathematics', label: 'Mathematics' },
@@ -69,26 +73,47 @@ function Signup() {
     setCurrentStep(1)
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
+    setError('')
     
     // Password validation
     if (formData.password !== formData.confirm_password) {
-      alert('Passwords do not match!')
+      setError('Passwords do not match!')
       return
     }
     
     if (formData.password.length < 8) {
-      alert('Password must be at least 8 characters long!')
+      setError('Password must be at least 8 characters long!')
+      return
+    }
+
+    if (!formData.expertise) {
+      setError('Please select your subject expertise!')
       return
     }
     
-    // Handle form submission here (integrate with Supabase later)
-    console.log('Form submitted:', formData)
-    
-    // Simulate successful signup and redirect to dashboard
-    alert('Account created successfully! Welcome to Scholarbase!')
-    navigate('/dashboard')
+    setLoading(true)
+
+    try {
+      await signup({
+        first_name: formData.first_name,
+        last_name: formData.last_name,
+        email: formData.email,
+        password: formData.password,
+        expertise: formData.expertise,
+        display_name: formData.display_name || undefined,
+        // Add additional fields as needed for the API
+        bio: '', // Default empty bio
+        experience_years: 0, // Default to 0, can be updated later
+      }, 'tutor')
+      
+      navigate('/dashboard')
+    } catch (err) {
+      setError(err.message || 'Registration failed. Please try again.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -120,6 +145,12 @@ function Signup() {
           </div>
           
           <div className="bg-stripes-horizontal rounded-lg shadow-lg p-8">
+            {error && (
+              <div className="mb-4 p-3 bg-red-600/20 border border-red-600/50 rounded-lg">
+                <p className="text-red-400 text-sm">{error}</p>
+              </div>
+            )}
+            
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Step 1: Basic Information */}
               {currentStep === 1 && (
@@ -301,9 +332,17 @@ function Signup() {
                     
                     <button
                       type="submit"
-                      className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+                      disabled={loading}
+                      className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 disabled:cursor-not-allowed text-white font-semibold py-3 px-6 rounded-lg transition-colors flex items-center justify-center"
                     >
-                      Create Account
+                      {loading ? (
+                        <>
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                          Creating Account...
+                        </>
+                      ) : (
+                        'Create Account'
+                      )}
                     </button>
                   </div>
                 </div>

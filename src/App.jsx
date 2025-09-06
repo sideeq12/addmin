@@ -1,4 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { AuthProvider } from './contexts/AuthContext'
+import ProtectedRoute from './components/ProtectedRoute'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import Homepage from './pages/Homepage'
@@ -18,9 +20,10 @@ import './App.css'
 
 function App() {
   return (
-    <Router>
-      <div className="min-h-screen bg-black text-white flex flex-col">
-        <Routes>
+    <AuthProvider>
+      <Router>
+        <div className="min-h-screen bg-black text-white flex flex-col">
+          <Routes>
           {/* Public routes with Navbar and Footer */}
           <Route path="/" element={
             <>
@@ -77,17 +80,46 @@ function App() {
             </>
           } />
 
-          {/* Dashboard routes without Navbar and Footer */}
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/courses" element={<Courses />} />
-          <Route path="/courses/create" element={<CreateCourse />} />
-          <Route path="/analytics" element={<Analytics />} />
-          <Route path="/students-performance" element={<StudentsPerformance />} />
-          <Route path="/earnings" element={<Earnings />} />
-          <Route path="/support" element={<Support />} />
+          {/* Protected Dashboard routes without Navbar and Footer */}
+          <Route path="/dashboard" element={
+            <ProtectedRoute requiredUserType="tutor">
+              <Dashboard />
+            </ProtectedRoute>
+          } />
+          <Route path="/courses" element={
+            <ProtectedRoute requiredUserType="tutor">
+              <Courses />
+            </ProtectedRoute>
+          } />
+          <Route path="/courses/create" element={
+            <ProtectedRoute requiredUserType="tutor">
+              <CreateCourse />
+            </ProtectedRoute>
+          } />
+          <Route path="/analytics" element={
+            <ProtectedRoute requiredUserType="tutor">
+              <Analytics />
+            </ProtectedRoute>
+          } />
+          <Route path="/students-performance" element={
+            <ProtectedRoute requiredUserType="tutor">
+              <StudentsPerformance />
+            </ProtectedRoute>
+          } />
+          <Route path="/earnings" element={
+            <ProtectedRoute requiredUserType="tutor">
+              <Earnings />
+            </ProtectedRoute>
+          } />
+          <Route path="/support" element={
+            <ProtectedRoute requiredUserType="tutor">
+              <Support />
+            </ProtectedRoute>
+          } />
         </Routes>
-      </div>
-    </Router>
+        </div>
+      </Router>
+    </AuthProvider>
   )
 }
 
