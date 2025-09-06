@@ -1,265 +1,338 @@
-import { Link } from 'react-router-dom'
+import { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 function Signup() {
+  const [currentStep, setCurrentStep] = useState(1)
+  const navigate = useNavigate()
+  
+  const subjectOptions = [
+    { value: 'Mathematics', label: 'Mathematics' },
+    { value: 'English Language', label: 'English Language' },
+    { value: 'Physics', label: 'Physics' },
+    { value: 'Chemistry', label: 'Chemistry' },
+    { value: 'Biology', label: 'Biology' },
+    { value: 'Economics', label: 'Economics' },
+    { value: 'Geography', label: 'Geography' },
+    { value: 'Government', label: 'Government' },
+    { value: 'Literature', label: 'Literature in English' },
+    { value: 'Agricultural Science', label: 'Agricultural Science' },
+    { value: 'Further Mathematics', label: 'Further Mathematics' },
+    { value: 'Technical Drawing', label: 'Technical Drawing' },
+    { value: 'Computer Studies', label: 'Computer Studies' },
+    { value: 'Civic Education', label: 'Civic Education' },
+    { value: 'History', label: 'History' }
+  ]
+  
+  const qualificationOptions = [
+    { value: 'SSCE', label: 'SSCE/WAEC/NECO' },
+    { value: 'OND', label: 'OND (Ordinary National Diploma)' },
+    { value: 'HND', label: 'HND (Higher National Diploma)' },
+    { value: 'NCE', label: 'NCE (Nigeria Certificate in Education)' },
+    { value: 'Bachelor', label: "Bachelor's Degree (B.Sc/B.A/B.Ed)" },
+    { value: 'Master', label: "Master's Degree (M.Sc/M.A/M.Ed)" },
+    { value: 'PhD', label: 'PhD (Doctor of Philosophy)' },
+    { value: 'Other', label: 'Other Professional Certification' }
+  ]
+  const [formData, setFormData] = useState({
+    // Step 1 - Basic Information
+    first_name: '',
+    last_name: '',
+    email: '',
+    display_name: '',
+    
+    // Step 2 - Account & Expertise  
+    expertise: '',
+    highest_qualification: '',
+    password: '',
+    confirm_password: ''
+  })
+
+  const handleInputChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    })
+  }
+
+  const nextStep = () => {
+    setCurrentStep(2)
+  }
+
+  const prevStep = () => {
+    setCurrentStep(1)
+  }
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    
+    // Password validation
+    if (formData.password !== formData.confirm_password) {
+      alert('Passwords do not match!')
+      return
+    }
+    
+    if (formData.password.length < 8) {
+      alert('Password must be at least 8 characters long!')
+      return
+    }
+    
+    // Handle form submission here (integrate with Supabase later)
+    console.log('Form submitted:', formData)
+    
+    // Simulate successful signup and redirect to dashboard
+    alert('Account created successfully! Welcome to Scholarbase!')
+    navigate('/dashboard')
+  }
+
   return (
-    <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-2xl mx-auto">
-        <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-white">Join TutorBase</h2>
-          <p className="mt-2 text-gray-400">Start teaching and earning today</p>
-        </div>
-        
-        <div className="bg-gray-800 rounded-lg shadow-lg p-8">
-          <form className="space-y-6">
-            {/* Personal Information */}
-            <div className="border-b border-gray-700 pb-6">
-              <h3 className="text-xl font-semibold text-white mb-4">Personal Information</h3>
-              
-              <div className="grid md:grid-cols-2 gap-4">
-                <div>
-                  <label htmlFor="firstName" className="block text-sm font-medium text-gray-300 mb-2">
-                    First Name *
-                  </label>
-                  <input
-                    id="firstName"
-                    name="firstName"
-                    type="text"
-                    required
-                    className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="Enter your first name"
-                  />
+    <div className="min-h-screen bg-stripes-diagonal-reverse">
+      <div className="grid md:grid-cols-2">
+        <div className='col-span-1 py-4 px-8 text-left'>
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold text-white">Join Scholarbase</h2>
+            <p className="mt-2 text-gray-400">Start teaching and earning today</p>
+            
+            {/* Step Indicator */}
+            <div className="flex justify-center mt-6">
+              <div className="flex items-center space-x-4">
+                <div className={`flex items-center ${currentStep >= 1 ? 'text-blue-400' : 'text-gray-500'}`}>
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${currentStep >= 1 ? 'bg-blue-600 text-white' : 'bg-gray-600 text-gray-300'}`}>
+                    1
+                  </div>
+                  <span className="ml-2 text-sm">Basic Info</span>
                 </div>
-
-                <div>
-                  <label htmlFor="lastName" className="block text-sm font-medium text-gray-300 mb-2">
-                    Last Name *
-                  </label>
-                  <input
-                    id="lastName"
-                    name="lastName"
-                    type="text"
-                    required
-                    className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="Enter your last name"
-                  />
-                </div>
-              </div>
-
-              <div className="grid md:grid-cols-2 gap-4 mt-4">
-                <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
-                    Email Address *
-                  </label>
-                  <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    required
-                    className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="Enter your email"
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="phone" className="block text-sm font-medium text-gray-300 mb-2">
-                    Phone Number *
-                  </label>
-                  <input
-                    id="phone"
-                    name="phone"
-                    type="tel"
-                    required
-                    className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="+234 801 234 5678"
-                  />
+                <div className={`w-12 h-0.5 ${currentStep >= 2 ? 'bg-blue-600' : 'bg-gray-600'}`}></div>
+                <div className={`flex items-center ${currentStep >= 2 ? 'text-blue-400' : 'text-gray-500'}`}>
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${currentStep >= 2 ? 'bg-blue-600 text-white' : 'bg-gray-600 text-gray-300'}`}>
+                    2
+                  </div>
+                  <span className="ml-2 text-sm">Account Setup</span>
                 </div>
               </div>
             </div>
-
-            {/* Teaching Information */}
-            <div className="border-b border-gray-700 pb-6">
-              <h3 className="text-xl font-semibold text-white mb-4">Teaching Information</h3>
-              
-              <div>
-                <label htmlFor="subjects" className="block text-sm font-medium text-gray-300 mb-2">
-                  Subjects You Can Teach *
-                </label>
-                <select
-                  id="subjects"
-                  name="subjects"
-                  multiple
-                  required
-                  className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  size="6"
-                >
-                  <option value="mathematics">Mathematics</option>
-                  <option value="english">English Language</option>
-                  <option value="physics">Physics</option>
-                  <option value="chemistry">Chemistry</option>
-                  <option value="biology">Biology</option>
-                  <option value="economics">Economics</option>
-                  <option value="geography">Geography</option>
-                  <option value="government">Government</option>
-                  <option value="literature">Literature</option>
-                  <option value="agricultural-science">Agricultural Science</option>
-                  <option value="further-mathematics">Further Mathematics</option>
-                  <option value="technical-drawing">Technical Drawing</option>
-                  <option value="computer-studies">Computer Studies</option>
-                  <option value="civic-education">Civic Education</option>
-                  <option value="history">History</option>
-                </select>
-                <p className="text-xs text-gray-400 mt-1">Hold Ctrl/Cmd to select multiple subjects</p>
-              </div>
-
-              <div className="grid md:grid-cols-2 gap-4 mt-4">
+          </div>
+          
+          <div className="bg-stripes-horizontal rounded-lg shadow-lg p-8">
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Step 1: Basic Information */}
+              {currentStep === 1 && (
                 <div>
-                  <label htmlFor="experience" className="block text-sm font-medium text-gray-300 mb-2">
-                    Teaching Experience
-                  </label>
-                  <select
-                    id="experience"
-                    name="experience"
-                    className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="">Select experience level</option>
-                    <option value="0-1">0-1 years</option>
-                    <option value="2-5">2-5 years</option>
-                    <option value="6-10">6-10 years</option>
-                    <option value="10+">10+ years</option>
-                  </select>
-                </div>
+                  <h3 className="text-xl font-semibold text-white mb-6">Basic Information</h3>
+                  
+                  <div className="space-y-4">
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div>
+                        <label htmlFor="first_name" className="block text-sm font-medium text-gray-300 mb-2">
+                          First Name *
+                        </label>
+                        <input
+                          type="text"
+                          id="first_name"
+                          name="first_name"
+                          value={formData.first_name}
+                          onChange={handleInputChange}
+                          className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          placeholder="Enter your first name"
+                          required
+                        />
+                      </div>
+                      
+                      <div>
+                        <label htmlFor="last_name" className="block text-sm font-medium text-gray-300 mb-2">
+                          Last Name *
+                        </label>
+                        <input
+                          type="text"
+                          id="last_name"
+                          name="last_name"
+                          value={formData.last_name}
+                          onChange={handleInputChange}
+                          className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          placeholder="Enter your last name"
+                          required
+                        />
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
+                        Email Address *
+                      </label>
+                      <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="Enter your email address"
+                        required
+                      />
+                    </div>
+                    
+                    <div>
+                      <label htmlFor="display_name" className="block text-sm font-medium text-gray-300 mb-2">
+                        Display Name
+                      </label>
+                      <input
+                        type="text"
+                        id="display_name"
+                        name="display_name"
+                        value={formData.display_name}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="How you'd like to be known (optional)"
+                      />
+                    </div>
+                  </div>
 
+                  <div className="flex justify-end mt-8">
+                    <button
+                      type="button"
+                      onClick={nextStep}
+                      className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+                    >
+                      Next Step →
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Step 2: Account Setup & Expertise */}
+              {currentStep === 2 && (
                 <div>
-                  <label htmlFor="education" className="block text-sm font-medium text-gray-300 mb-2">
-                    Highest Education Level
-                  </label>
-                  <select
-                    id="education"
-                    name="education"
-                    className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="">Select education level</option>
-                    <option value="bachelor">Bachelor's Degree</option>
-                    <option value="master">Master's Degree</option>
-                    <option value="phd">Ph.D</option>
-                    <option value="professional">Professional Certificate</option>
-                  </select>
+                  <h3 className="text-xl font-semibold text-white mb-6">Account Setup & Expertise</h3>
+                  
+                  <div className="space-y-4">
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-2">
+                          Subject Expertise *
+                        </label>
+                        <Select
+                          value={formData.expertise}
+                          onValueChange={(value) => setFormData({...formData, expertise: value})}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select your primary expertise" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {subjectOptions.map((option) => (
+                              <SelectItem key={option.value} value={option.value}>
+                                {option.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-2">
+                          Highest Qualification *
+                        </label>
+                        <Select
+                          value={formData.highest_qualification}
+                          onValueChange={(value) => setFormData({...formData, highest_qualification: value})}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select your qualification" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {qualificationOptions.map((option) => (
+                              <SelectItem key={option.value} value={option.value}>
+                                {option.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div>
+                        <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
+                          Password *
+                        </label>
+                        <input
+                          type="password"
+                          id="password"
+                          name="password"
+                          value={formData.password}
+                          onChange={handleInputChange}
+                          className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          placeholder="Create a strong password"
+                          required
+                        />
+                      </div>
+                      
+                      <div>
+                        <label htmlFor="confirm_password" className="block text-sm font-medium text-gray-300 mb-2">
+                          Confirm Password *
+                        </label>
+                        <input
+                          type="password"
+                          id="confirm_password"
+                          name="confirm_password"
+                          value={formData.confirm_password}
+                          onChange={handleInputChange}
+                          className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          placeholder="Confirm your password"
+                          required
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-between mt-8">
+                    <button
+                      type="button"
+                      onClick={prevStep}
+                      className="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+                    >
+                      ← Previous
+                    </button>
+                    
+                    <button
+                      type="submit"
+                      className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+                    >
+                      Create Account
+                    </button>
+                  </div>
                 </div>
-              </div>
+              )}
+            </form>
 
-              <div className="mt-4">
-                <label htmlFor="bio" className="block text-sm font-medium text-gray-300 mb-2">
-                  Brief Bio
-                </label>
-                <textarea
-                  id="bio"
-                  name="bio"
-                  rows="4"
-                  className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Tell us about your teaching background and expertise..."
-                />
-              </div>
+            <div className="mt-8 text-center">
+              <p className="text-gray-400">
+                Already have an account?{' '}
+                <Link to="/login" className="text-blue-400 hover:text-blue-300 font-medium transition-colors">
+                  Sign in here
+                </Link>
+              </p>
             </div>
-
-            {/* Account Security */}
-            <div className="border-b border-gray-700 pb-6">
-              <h3 className="text-xl font-semibold text-white mb-4">Account Security</h3>
-              
-              <div className="grid md:grid-cols-2 gap-4">
-                <div>
-                  <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
-                    Password *
-                  </label>
-                  <input
-                    id="password"
-                    name="password"
-                    type="password"
-                    required
-                    className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="Create a strong password"
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-300 mb-2">
-                    Confirm Password *
-                  </label>
-                  <input
-                    id="confirmPassword"
-                    name="confirmPassword"
-                    type="password"
-                    required
-                    className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="Confirm your password"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Terms and Conditions */}
-            <div>
-              <div className="flex items-start">
-                <input
-                  id="terms"
-                  name="terms"
-                  type="checkbox"
-                  required
-                  className="h-4 w-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500 mt-1"
-                />
-                <label htmlFor="terms" className="ml-3 text-sm text-gray-300">
-                  I agree to the{' '}
-                  <a href="#" className="text-blue-400 hover:text-blue-300 transition-colors">
-                    Terms of Service
-                  </a>{' '}
-                  and{' '}
-                  <a href="#" className="text-blue-400 hover:text-blue-300 transition-colors">
-                    Privacy Policy
-                  </a>
-                </label>
-              </div>
-
-              <div className="flex items-start mt-3">
-                <input
-                  id="marketing"
-                  name="marketing"
-                  type="checkbox"
-                  className="h-4 w-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500 mt-1"
-                />
-                <label htmlFor="marketing" className="ml-3 text-sm text-gray-300">
-                  I would like to receive updates about new features and opportunities
-                </label>
-              </div>
-            </div>
-
-            <div>
-              <button
-                type="submit"
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 px-6 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800"
-              >
-                Create Tutor Account
-              </button>
-            </div>
-          </form>
-
-          <div className="mt-6 text-center">
-            <p className="text-gray-400">
-              Already have an account?{' '}
-              <Link to="/login" className="text-blue-400 hover:text-blue-300 font-medium transition-colors">
-                Sign in here
-              </Link>
-            </p>
           </div>
         </div>
-
-        {/* What happens next */}
-        <div className="mt-8 bg-blue-900/20 border border-blue-500/30 rounded-lg p-6">
-          <h3 className="text-lg font-semibold text-white mb-3">What happens next?</h3>
-          <ol className="space-y-2 text-sm text-gray-300">
-            <li>1. We'll review your application within 24-48 hours</li>
-            <li>2. You'll receive an email with verification instructions</li>
-            <li>3. Complete your profile and upload sample content</li>
-            <li>4. Start teaching and earning immediately after approval</li>
-          </ol>
+        
+        <div className='col-span-1 relative overflow-hidden'>
+          <img 
+            src="/class.avif" 
+            alt="Students learning" 
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-blue-900/60 flex items-center justify-center">
+            <div className="text-center p-8">
+              <h3 className="text-3xl font-bold text-white mb-4">Join Thousands of Successful Tutors</h3>
+              <p className="text-xl text-blue-100">Start earning from your expertise today</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>

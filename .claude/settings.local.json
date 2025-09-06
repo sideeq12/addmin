@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "WebFetch(domain:tryscholarbase.com)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(npx:*)"
     ],
     "deny": [],
     "ask": []

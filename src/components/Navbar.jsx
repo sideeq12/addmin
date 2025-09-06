@@ -5,16 +5,16 @@ function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
 
   return (
-    <nav className="bg-gray-800 border-b border-gray-700 sticky top-0 z-50">
+    <nav className="bg-black border-b border-gray-800 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+        <div className="flex  items-center h-16">
           <div className="flex items-center">
             <Link to="/" className="text-2xl font-bold text-blue-400">
-              TutorBase
+              scholarbase
             </Link>
           </div>
           
-          <div className="hidden md:block">
+          <div className="hidden md:block ml-auto ">
             <div className="flex items-center space-x-8">
               <Link 
                 to="/" 
@@ -43,7 +43,7 @@ function Navbar() {
             </div>
           </div>
 
-          <div className="hidden md:flex items-center space-x-4">
+          <div className="hidden md:flex items-center  space-x-4">
             <Link 
               to="/login" 
               className="text-gray-300 hover:text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"

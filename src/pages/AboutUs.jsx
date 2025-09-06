@@ -1,13 +1,24 @@
 function AboutUs() {
   return (
-    <div className="min-h-screen py-12">
+    <div className="min-h-screen py-12 bg-stripes-diagonal">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Hero Section */}
         <div className="text-center mb-16">
-          <h1 className="text-4xl font-bold text-white mb-6">About TutorBase</h1>
-          <p className="text-lg text-gray-400 max-w-3xl mx-auto">
-            Empowering Nigerian tutors to share knowledge and transform education across the nation
-          </p>
+          <div className="relative mb-8">
+            <img 
+              src="/class.avif" 
+              alt="Classroom with students learning" 
+              className="w-full h-64 md:h-96 object-cover rounded-2xl shadow-2xl"
+            />
+            <div className="absolute inset-0 bg-gray-900/50 rounded-2xl flex items-center justify-center">
+              <div className="text-center">
+                <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">About Scholarbase</h1>
+                <p className="text-lg text-gray-200 max-w-2xl mx-auto px-4">
+                  Empowering Nigerian tutors to share knowledge and transform education across the nation
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Mission Section */}
@@ -25,12 +36,21 @@ function AboutUs() {
                 and earn from their knowledge.
               </p>
             </div>
-            <div className="bg-blue-600 p-8 rounded-lg text-center">
-              <div className="text-4xl mb-4">🎯</div>
-              <h3 className="text-2xl font-semibold text-white mb-2">Our Goal</h3>
-              <p className="text-blue-100">
-                To help 1 million Nigerian students pass their exams through quality tutoring
-              </p>
+            <div className="relative">
+              <img 
+                src="/teaching.avif" 
+                alt="Teacher helping students" 
+                className="w-full h-64 object-cover rounded-lg shadow-lg"
+              />
+              <div className="absolute inset-0 bg-blue-600/80 rounded-lg flex items-center justify-center text-center p-6">
+                <div>
+                  <div className="text-4xl mb-4">🎯</div>
+                  <h3 className="text-2xl font-semibold text-white mb-2">Our Goal</h3>
+                  <p className="text-blue-100">
+                    To help 1 million Nigerian students pass their exams through quality tutoring
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -105,9 +125,18 @@ function AboutUs() {
         </div>
 
         {/* Stats Section */}
-        <div className="text-center">
-          <h2 className="text-4xl font-bold text-white mb-12">Our Impact So Far</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+        <div className="bg-gray-800 rounded-2xl p-8">
+          <div className="grid md:grid-cols-2 gap-8 items-center">
+            <div>
+              <img 
+                src="/classs.avif" 
+                alt="Students studying together" 
+                className="w-full h-64 object-cover rounded-lg shadow-lg"
+              />
+            </div>
+            <div className="text-center">
+              <h2 className="text-4xl font-bold text-white mb-8">Our Impact So Far</h2>
+              <div className="grid grid-cols-2 gap-6">
             <div>
               <div className="text-4xl font-bold text-blue-400 mb-2">2,500+</div>
               <div className="text-gray-300">Verified Tutors</div>
@@ -126,6 +155,8 @@ function AboutUs() {
             <div>
               <div className="text-4xl font-bold text-blue-400 mb-2">98%</div>
               <div className="text-gray-300">Pass Rate</div>
+            </div>
+          </div>
             </div>
           </div>
         </div>

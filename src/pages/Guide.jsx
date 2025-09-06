@@ -1,17 +1,28 @@
 function Guide() {
   return (
-    <div className="min-h-screen py-12">
+    <div className="min-h-screen py-12 bg-stripes-vertical">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Hero Section */}
         <div className="text-center mb-16">
-          <h1 className="text-5xl font-bold text-white mb-6">Tutor Guide</h1>
-          <p className="text-xl text-gray-400">
-            Everything you need to know about creating quality content and succeeding as a tutor
-          </p>
+          <div className="relative mb-8">
+            <img 
+              src="/teaching.avif" 
+              alt="Professional tutor teaching" 
+              className="w-full h-64 md:h-80 object-cover rounded-2xl shadow-2xl"
+            />
+            <div className="absolute inset-0 bg-gray-900/50 rounded-2xl flex items-center justify-center">
+              <div className="text-center">
+                <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Tutor Guide</h1>
+                <p className="text-lg text-gray-200 max-w-3xl mx-auto px-4">
+                  Everything you need to know about creating quality content and succeeding as a tutor
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Getting Started */}
-        <div className="bg-gray-800 rounded-lg p-8 mb-12">
+        <div className="bg-black bg-stripes-horizontal rounded-lg p-8 mb-12">
           <h2 className="text-3xl font-bold text-white mb-8">Getting Started</h2>
           
           <div className="space-y-8">
@@ -50,8 +61,20 @@ function Guide() {
         </div>
 
         {/* Video Quality Standards */}
-        <div className="bg-gray-800 rounded-lg p-8 mb-12">
-          <h2 className="text-3xl font-bold text-white mb-8">Video Quality Standards</h2>
+        <div className="bg-black bg-stripes-horizontal rounded-lg p-8 mb-12">
+          <div className="grid md:grid-cols-2 gap-8 items-start mb-8">
+            <div>
+              <h2 className="text-3xl font-bold text-white mb-6">Video Quality Standards</h2>
+              <p className="text-gray-300 mb-6">Follow these guidelines to ensure your content meets our quality standards and provides the best learning experience for students.</p>
+            </div>
+            <div>
+              <img 
+                src="/classs.avif" 
+                alt="Professional teaching setup" 
+                className="w-full h-48 object-cover rounded-lg shadow-lg"
+              />
+            </div>
+          </div>
           
           <div className="grid md:grid-cols-2 gap-8">
             <div>
@@ -101,8 +124,20 @@ function Guide() {
         </div>
 
         {/* Content Creation Guidelines */}
-        <div className="bg-gray-800 rounded-lg p-8 mb-12">
-          <h2 className="text-3xl font-bold text-white mb-8">Content Creation Guidelines</h2>
+        <div className="bg-black bg-stripes-horizontal rounded-lg p-8 mb-12">
+          <div className="grid md:grid-cols-2 gap-8 items-start mb-8">
+            <div>
+              <h2 className="text-3xl font-bold text-white mb-6">Content Creation Guidelines</h2>
+              <p className="text-gray-300">Create engaging, educational content that helps students succeed in their exams.</p>
+            </div>
+            <div>
+              <img 
+                src="/class.avif" 
+                alt="Student learning from quality content" 
+                className="w-full h-48 object-cover rounded-lg shadow-lg"
+              />
+            </div>
+          </div>
           
           <div className="space-y-6">
             <div>
@@ -138,7 +173,7 @@ function Guide() {
         </div>
 
         {/* Upload Process */}
-        <div className="bg-gray-800 rounded-lg p-8 mb-12">
+        <div className="bg-black bg-stripes-horizontal rounded-lg p-8 mb-12">
           <h2 className="text-3xl font-bold text-white mb-8">How to Upload Your Content</h2>
           
           <div className="space-y-6">

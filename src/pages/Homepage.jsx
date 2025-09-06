@@ -7,10 +7,10 @@ function Homepage() {
   return (
     <div className="min-h-screen">
       {/* Section 1: Hero */}
-      <section className="relative min-h-screen flex items-center overflow-hidden bg-gray-900">
+      <section className="relative min-h-screen flex items-center overflow-hidden bg-black bg-stripes-diagonal">
         {/* Background Image Overlay */}
         <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-gray-900/90 z-10"></div>
+          <div className="absolute inset-0 bg-black/90 z-10"></div>
           <img 
             src="/teaching.avif" 
             alt="Teaching Background" 
@@ -160,7 +160,7 @@ function Homepage() {
       </section>
 
       {/* Section 2: Earnings Calculator */}
-      <section className="py-20 bg-gray-800 relative overflow-hidden">
+      <section className="py-20 bg-black bg-stripes-diagonal-reverse relative overflow-hidden">
         {/* Background decorative elements */}
         <div className="absolute inset-0">
           <div className="absolute top-0 left-1/4 w-96 h-96 bg-gray-600/10 rounded-full filter blur-3xl"></div>
@@ -168,7 +168,7 @@ function Homepage() {
         </div>
         
         <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-gray-900/80 rounded-3xl p-8 border border-gray-600/20 shadow-2xl backdrop-blur-sm">
+          <div className="bg-black/80 rounded-3xl p-8 border border-gray-600/20 shadow-2xl backdrop-blur-sm">
             <div className="text-center mb-12">
               <div className="inline-flex items-center bg-gray-700/50 backdrop-blur-sm border border-gray-500 text-gray-300 px-6 py-3 rounded-full text-lg font-semibold mb-6">
                 💰 Earnings Calculator
@@ -256,7 +256,7 @@ function Homepage() {
               </div>
               
               <div className="relative">
-                <div className="bg-gray-900/90 rounded-3xl p-8 border border-gray-600/30 shadow-2xl relative overflow-hidden backdrop-blur-sm">
+                <div className="bg-black/90 rounded-3xl p-8 border border-gray-600/30 shadow-2xl relative overflow-hidden backdrop-blur-sm">
                   {/* Animated background gradient */}
                   <div className="absolute inset-0 bg-gradient-to-br from-gray-700/10 via-gray-600/10 to-gray-800/10 animate-gradient"></div>
                   
@@ -318,7 +318,7 @@ function Homepage() {
       </section>
 
       {/* Section 3: Key Features */}
-      <section className="py-20 bg-gray-900">
+      <section className="py-20 bg-black bg-stripes-vertical">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold text-white mb-4">Everything You Need to Succeed</h2>
@@ -403,7 +403,7 @@ function Homepage() {
       </section>
 
       {/* Section 4: Course Creation Workflow */}
-      <section className="py-20 bg-gray-800">
+      <section className="py-20 bg-black bg-stripes-horizontal">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold text-white mb-4">Create Courses Like a Pro</h2>
@@ -449,7 +449,7 @@ function Homepage() {
             
             <div className="relative">
               {/* Course Builder Preview */}
-              <div className="bg-gray-800 border border-gray-700 rounded-lg p-6">
+              <div className="bg-gray-800 border border-gray-800 rounded-lg p-6">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-white font-semibold">Course Builder</h3>
                   <div className="flex space-x-2">
@@ -503,7 +503,7 @@ function Homepage() {
       </section>
 
       {/* Section 5: How It Works */}
-      <section className="py-20 bg-gray-900">
+      <section className="py-20 bg-black bg-stripes-wide-diagonal">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold text-white mb-4">Start Teaching in Minutes</h2>
@@ -548,31 +548,31 @@ function Homepage() {
       </section>
 
       {/* Section 4: Success Statistics */}
-      <section className="py-20 bg-gray-800">
+      <section className="py-20 bg-black bg-stripes-wide-diagonal-dense">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold text-white mb-4">Our Impact</h2>
             <p className="text-lg text-gray-400">Numbers that speak for themselves</p>
           </div>
           
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
             <div className="text-center">
-              <div className="text-3xl font-bold text-blue-400 mb-2">2,500+</div>
+              <div className="text-2xl md:text-3xl font-bold text-blue-400 mb-2">2,500+</div>
               <div className="text-gray-300">Active Tutors</div>
             </div>
             
             <div className="text-center">
-              <div className="text-3xl font-bold text-blue-400 mb-2">50,000+</div>
+              <div className="text-2xl md:text-3xl font-bold text-blue-400 mb-2">50,000+</div>
               <div className="text-gray-300">Students Reached</div>
             </div>
             
             <div className="text-center">
-              <div className="text-3xl font-bold text-blue-400 mb-2">98%</div>
+              <div className="text-2xl md:text-3xl font-bold text-blue-400 mb-2">98%</div>
               <div className="text-gray-300">Success Rate</div>
             </div>
             
             <div className="text-center">
-              <div className="text-3xl font-bold text-blue-400 mb-2">15</div>
+              <div className="text-2xl md:text-3xl font-bold text-blue-400 mb-2">15</div>
               <div className="text-gray-300">Subjects Covered</div>
             </div>
           </div>
@@ -580,7 +580,7 @@ function Homepage() {
       </section>
 
       {/* Section 5: Tutor Testimonials */}
-      <section className="py-20 bg-gray-900">
+      <section className="py-20 bg-black bg-stripes-vertical">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold text-white mb-4">What Our Tutors Say</h2>
@@ -631,14 +631,14 @@ function Homepage() {
       </section>
 
       {/* Section 6: Subject Categories */}
-      <section className="py-20 bg-gray-800">
+      <section className="py-20 bg-black bg-stripes-horizontal">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold text-white mb-4">Teach Your Expertise</h2>
             <p className="text-lg text-gray-400">We cover all major WAEC, JAMB & NECO subjects</p>
           </div>
           
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
             {[
               'Mathematics', 'English Language', 'Physics', 'Chemistry', 'Biology',
               'Economics', 'Geography', 'Government', 'Literature', 'Agricultural Science',

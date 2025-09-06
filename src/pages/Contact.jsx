@@ -2,14 +2,25 @@ import { Link } from 'react-router-dom'
 
 function Contact() {
   return (
-    <div className="min-h-screen py-12">
+    <div className="min-h-screen py-12 bg-stripes-diagonal-reverse">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Hero Section */}
         <div className="text-center mb-16">
-          <h1 className="text-5xl font-bold text-white mb-6">Contact Us</h1>
-          <p className="text-xl text-gray-400">
-            Get in touch with our team or find what you're looking for
-          </p>
+          <div className="relative mb-8">
+            <img 
+              src="/teaching.avif" 
+              alt="Contact our support team" 
+              className="w-full h-48 md:h-64 object-cover rounded-2xl shadow-2xl"
+            />
+            <div className="absolute inset-0 bg-gray-900/60 rounded-2xl flex items-center justify-center">
+              <div className="text-center">
+                <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Contact Us</h1>
+                <p className="text-lg text-gray-200 max-w-2xl mx-auto px-4">
+                  Get in touch with our team or find what you're looking for
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div className="grid lg:grid-cols-2 gap-12">
@@ -22,13 +33,13 @@ function Contact() {
                 <h3 className="text-xl font-semibold text-white mb-4">📧 Email Support</h3>
                 <div className="space-y-2">
                   <p className="text-gray-300">
-                    <strong>General Inquiries:</strong> <a href="mailto:info@tutorbase.ng" className="text-blue-400 hover:text-blue-300">info@tutorbase.ng</a>
+                    <strong>General Inquiries:</strong> <a href="mailto:info@scholarbase.ng" className="text-blue-400 hover:text-blue-300">info@scholarbase.ng</a>
                   </p>
                   <p className="text-gray-300">
-                    <strong>Tutor Support:</strong> <a href="mailto:tutors@tutorbase.ng" className="text-blue-400 hover:text-blue-300">tutors@tutorbase.ng</a>
+                    <strong>Tutor Support:</strong> <a href="mailto:tutors@scholarbase.ng" className="text-blue-400 hover:text-blue-300">tutors@scholarbase.ng</a>
                   </p>
                   <p className="text-gray-300">
-                    <strong>Technical Issues:</strong> <a href="mailto:tech@tutorbase.ng" className="text-blue-400 hover:text-blue-300">tech@tutorbase.ng</a>
+                    <strong>Technical Issues:</strong> <a href="mailto:tech@scholarbase.ng" className="text-blue-400 hover:text-blue-300">tech@scholarbase.ng</a>
                   </p>
                 </div>
               </div>
@@ -46,7 +57,7 @@ function Contact() {
               <div className="bg-gray-800 p-6 rounded-lg">
                 <h3 className="text-xl font-semibold text-white mb-4">🏢 Office Address</h3>
                 <p className="text-gray-300">
-                  TutorBase Nigeria<br />
+                  Scholarbase Nigeria<br />
                   Plot 123, Education Avenue<br />
                   Victoria Island, Lagos<br />
                   Nigeria
@@ -67,6 +78,13 @@ function Contact() {
 
           {/* Contact Form */}
           <div>
+            <div className="mb-6">
+              <img 
+                src="/class.avif" 
+                alt="Students and tutors connecting" 
+                className="w-full h-48 object-cover rounded-lg shadow-lg"
+              />
+            </div>
             <div className="bg-gray-800 p-8 rounded-lg">
               <h2 className="text-3xl font-bold text-white mb-6">Send us a Message</h2>
               <form className="space-y-6">

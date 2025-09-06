@@ -2,13 +2,13 @@ import { Link } from 'react-router-dom'
 
 function Footer() {
   return (
-    <footer className="bg-gray-900 border-t border-gray-700">
+    <footer className="bg-black border-t border-gray-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Company Info */}
           <div className="col-span-1 md:col-span-1">
             <Link to="/" className="text-2xl font-bold text-blue-400 mb-4 block">
-              TutorBase
+              Scholarbase
             </Link>
             <p className="text-gray-400 text-sm leading-relaxed mb-4">
               Nigeria's premier platform for tutors to create, share, and monetize educational content for WAEC, JAMB, and NECO preparation.
@@ -93,7 +93,7 @@ function Footer() {
                 <option>🇺🇸 English (US)</option>
                 <option>🇬🇧 English (UK)</option>
               </select>
-              <p className="text-gray-400 text-sm">© 2024 TutorBase Nigeria. All rights reserved.</p>
+              <p className="text-gray-400 text-sm">© 2024 Scholarbase Nigeria. All rights reserved.</p>
             </div>
           </div>
         </div>

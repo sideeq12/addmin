@@ -2,14 +2,14 @@ import { Link } from 'react-router-dom'
 
 function Login() {
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-stripes-diagonal flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
           <h2 className="text-3xl font-bold text-white">Welcome Back</h2>
           <p className="mt-2 text-gray-400">Sign in to your tutor account</p>
         </div>
         
-        <div className="bg-gray-800 rounded-lg shadow-lg p-8">
+        <div className="bg-black bg-stripes-vertical rounded-lg shadow-lg p-8">
           <form className="space-y-6">
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
