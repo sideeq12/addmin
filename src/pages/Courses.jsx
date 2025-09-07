@@ -34,21 +34,29 @@ function Courses() {
       const response = await courseService.getTutorCourses(user.id)
       const coursesData = response.courses || []
       
+      console.log('🔍 Raw courses data from API:', coursesData)
+      
       // Transform API data to match UI expectations
-      const transformedCourses = coursesData.map(course => ({
-        id: course.id,
-        title: course.title,
-        subject: course.category || 'General',
-        students: 0, // Mock data - enrollment endpoint not yet available
-        rating: 4.8, // Mock data - ratings endpoint not yet available
-        status: course.is_published ? 'active' : 'draft',
-        earnings: '₦0', // Mock data - earnings endpoint not yet available
-        price: course.price,
-        image: course.thumbnail_url || '/class.avif',
-        description: course.description,
-        level: course.level,
-        created_at: course.created_at
-      }))
+      const transformedCourses = coursesData.map(course => {
+        console.log(`🔍 Course "${course.title}" - is_published:`, course.is_published, typeof course.is_published)
+        
+        return {
+          id: course.id,
+          title: course.title,
+          subject: course.category || 'General',
+          students: 0, // Mock data - enrollment endpoint not yet available
+          rating: 4.8, // Mock data - ratings endpoint not yet available
+          status: course.is_published === true || course.is_published === 'true' ? 'active' : 'draft',
+          earnings: '₦0', // Mock data - earnings endpoint not yet available
+          price: course.price,
+          image: course.thumbnail_url || '/class.avif',
+          description: course.description,
+          level: course.level,
+          created_at: course.created_at
+        }
+      })
+      
+      console.log('🔍 Transformed courses:', transformedCourses.map(c => ({ title: c.title, status: c.status })))
       
       setCourses(transformedCourses)
     } catch (err) {
