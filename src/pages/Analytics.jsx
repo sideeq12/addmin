@@ -16,14 +16,11 @@ import {
 } from 'chart.js'
 import { Line, Bar, Doughnut } from 'react-chartjs-2'
 import { 
-  MdVisibility, 
-  MdCheckCircle, 
-  MdAccessTime, 
-  MdStar,
   MdTrendingUp,
   MdAttachMoney,
   MdPeople,
-  MdAnalytics
+  MdAnalytics,
+  MdStar
 } from 'react-icons/md'
 
 ChartJS.register(
@@ -213,72 +210,6 @@ function Analytics() {
             </button>
           </div>
 
-          {/* Key Metrics */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            <div className="bg-gray-800 p-4 rounded-lg border border-gray-700 hover:border-blue-600/50 transition-colors">
-              <div className="flex items-center justify-between mb-2">
-                <div>
-                  <p className="text-gray-400 text-xs">Total Views</p>
-                  <p className="text-lg font-semibold text-white">12,847</p>
-                </div>
-                <div className="w-8 h-8 bg-blue-600/10 rounded-lg flex items-center justify-center border border-blue-600/20">
-                  <MdVisibility className="w-4 h-4 text-blue-400" />
-                </div>
-              </div>
-              <div className="text-green-400 text-xs flex items-center">
-                <MdTrendingUp className="w-3 h-3 mr-1" />
-                +15.2% vs last month
-              </div>
-            </div>
-
-            <div className="bg-gray-800 p-4 rounded-lg border border-gray-700 hover:border-emerald-600/50 transition-colors">
-              <div className="flex items-center justify-between mb-2">
-                <div>
-                  <p className="text-gray-400 text-xs">Completion Rate</p>
-                  <p className="text-lg font-semibold text-white">87.3%</p>
-                </div>
-                <div className="w-8 h-8 bg-emerald-600/10 rounded-lg flex items-center justify-center border border-emerald-600/20">
-                  <MdCheckCircle className="w-4 h-4 text-emerald-400" />
-                </div>
-              </div>
-              <div className="text-green-400 text-xs flex items-center">
-                <MdTrendingUp className="w-3 h-3 mr-1" />
-                +4.1% vs last month
-              </div>
-            </div>
-
-            <div className="bg-gray-800 p-4 rounded-lg border border-gray-700 hover:border-purple-600/50 transition-colors">
-              <div className="flex items-center justify-between mb-2">
-                <div>
-                  <p className="text-gray-400 text-xs">Avg Watch Time</p>
-                  <p className="text-lg font-semibold text-white">24m</p>
-                </div>
-                <div className="w-8 h-8 bg-purple-600/10 rounded-lg flex items-center justify-center border border-purple-600/20">
-                  <MdAccessTime className="w-4 h-4 text-purple-400" />
-                </div>
-              </div>
-              <div className="text-green-400 text-xs flex items-center">
-                <MdTrendingUp className="w-3 h-3 mr-1" />
-                +2.8% vs last month
-              </div>
-            </div>
-
-            <div className="bg-gray-800 p-4 rounded-lg border border-gray-700 hover:border-yellow-600/50 transition-colors">
-              <div className="flex items-center justify-between mb-2">
-                <div>
-                  <p className="text-gray-400 text-xs">Student Satisfaction</p>
-                  <p className="text-lg font-semibold text-white">4.8/5</p>
-                </div>
-                <div className="w-8 h-8 bg-yellow-600/10 rounded-lg flex items-center justify-center border border-yellow-600/20">
-                  <MdStar className="w-4 h-4 text-yellow-400" />
-                </div>
-              </div>
-              <div className="text-yellow-400 text-xs flex items-center">
-                <MdTrendingUp className="w-3 h-3 mr-1" />
-                +0.2 vs last month
-              </div>
-            </div>
-          </div>
 
           {/* Charts Section */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">

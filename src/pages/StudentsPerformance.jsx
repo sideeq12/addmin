@@ -1,4 +1,11 @@
 import Sidebar from '../components/Sidebar'
+import { 
+  MdPeople,
+  MdTrendingUp,
+  MdSchool,
+  MdStar,
+  MdCheckCircle
+} from 'react-icons/md'
 
 function StudentsPerformance() {
   const students = [
@@ -22,30 +29,42 @@ function StudentsPerformance() {
 
           {/* Performance Overview */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-            <div className="bg-gray-800 p-6 rounded-lg border border-gray-800">
-              <div className="text-center">
-                <div className="text-3xl font-bold text-green-400 mb-2">78%</div>
-                <p className="text-gray-400">Average Progress</p>
+            <div className="bg-gray-800 p-6 rounded-lg border border-gray-700 hover:border-emerald-600/50 transition-colors">
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-12 h-12 bg-emerald-600/10 rounded-lg flex items-center justify-center border border-emerald-600/20">
+                  <MdTrendingUp className="w-6 h-6 text-emerald-400" />
+                </div>
+                <div className="text-3xl font-bold text-emerald-400">78%</div>
               </div>
+              <p className="text-gray-400 text-center">Average Progress</p>
             </div>
-            <div className="bg-gray-800 p-6 rounded-lg border border-gray-800">
-              <div className="text-center">
-                <div className="text-3xl font-bold text-blue-400 mb-2">4.6/5</div>
-                <p className="text-gray-400">Average Grade</p>
+            <div className="bg-gray-800 p-6 rounded-lg border border-gray-700 hover:border-yellow-600/50 transition-colors">
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-12 h-12 bg-yellow-600/10 rounded-lg flex items-center justify-center border border-yellow-600/20">
+                  <MdStar className="w-6 h-6 text-yellow-400" />
+                </div>
+                <div className="text-3xl font-bold text-yellow-400">4.6/5</div>
               </div>
+              <p className="text-gray-400 text-center">Average Grade</p>
             </div>
-            <div className="bg-gray-800 p-6 rounded-lg border border-gray-800">
-              <div className="text-center">
-                <div className="text-3xl font-bold text-yellow-400 mb-2">92%</div>
-                <p className="text-gray-400">Completion Rate</p>
+            <div className="bg-gray-800 p-6 rounded-lg border border-gray-700 hover:border-blue-600/50 transition-colors">
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-12 h-12 bg-blue-600/10 rounded-lg flex items-center justify-center border border-blue-600/20">
+                  <MdCheckCircle className="w-6 h-6 text-blue-400" />
+                </div>
+                <div className="text-3xl font-bold text-blue-400">92%</div>
               </div>
+              <p className="text-gray-400 text-center">Completion Rate</p>
             </div>
           </div>
 
           {/* Students Table */}
-          <div className="bg-gray-800 rounded-lg border border-gray-800 overflow-hidden">
-            <div className="p-6 border-b border-gray-800">
-              <h3 className="text-xl font-semibold text-white">Student Progress</h3>
+          <div className="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden">
+            <div className="p-6 border-b border-gray-700">
+              <div className="flex items-center space-x-2">
+                <MdSchool className="w-5 h-5 text-gray-400" />
+                <h3 className="text-xl font-semibold text-white">Student Progress</h3>
+              </div>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full">
@@ -63,8 +82,8 @@ function StudentsPerformance() {
                     <tr key={student.id} className="hover:bg-gray-700/50">
                       <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
-                          <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-semibold">
-                            {student.name.charAt(0)}
+                          <div className="w-10 h-10 bg-blue-600/10 rounded-full flex items-center justify-center border border-blue-600/20">
+                            <MdPeople className="w-5 h-5 text-blue-400" />
                           </div>
                           <div className="ml-4">
                             <div className="text-sm font-medium text-white">{student.name}</div>
@@ -76,7 +95,7 @@ function StudentsPerformance() {
                       <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div className="w-12 sm:w-16 bg-gray-700 rounded-full h-2 mr-2">
-                            <div className="bg-blue-600 h-2 rounded-full" style={{width: `${student.progress}%`}}></div>
+                            <div className="bg-emerald-600 h-2 rounded-full" style={{width: `${student.progress}%`}}></div>
                           </div>
                           <span className="text-sm text-gray-300">{student.progress}%</span>
                         </div>

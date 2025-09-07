@@ -1,6 +1,15 @@
 import { Link } from 'react-router-dom'
 import { useState } from 'react'
 import Sidebar from '../components/Sidebar'
+import { 
+  MdSupport,
+  MdEmail,
+  MdPhone,
+  MdChat,
+  MdHelpOutline,
+  MdCheckCircle,
+  MdSend
+} from 'react-icons/md'
 
 function Support() {
   const [selectedCategory, setSelectedCategory] = useState('technical')
@@ -27,8 +36,11 @@ function Support() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
             {/* Support Form */}
             <div className="order-2 lg:order-1 lg:col-span-2">
-              <div className="bg-gray-800 p-6 rounded-lg border border-gray-800">
-                <h3 className="text-xl font-semibold text-white mb-6">Submit a Support Request</h3>
+              <div className="bg-gray-800 p-6 rounded-lg border border-gray-700 hover:border-blue-600/50 transition-colors">
+                <div className="flex items-center space-x-2 mb-6">
+                  <MdSupport className="w-5 h-5 text-gray-400" />
+                  <h3 className="text-xl font-semibold text-white">Submit a Support Request</h3>
+                </div>
                 
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div>
@@ -72,9 +84,10 @@ function Support() {
 
                   <button 
                     type="submit"
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-semibold transition-colors"
+                    className="w-full bg-blue-600/10 hover:bg-blue-600/20 text-blue-400 hover:text-blue-300 border border-blue-600/30 hover:border-blue-600/50 py-3 px-6 rounded-lg font-semibold transition-colors flex items-center justify-center space-x-2"
                   >
-                    Submit Support Request
+                    <MdSend className="w-4 h-4" />
+                    <span>Submit Support Request</span>
                   </button>
                 </form>
               </div>
@@ -83,33 +96,48 @@ function Support() {
             {/* Support Info */}
             <div className="order-1 lg:order-2 space-y-4 lg:space-y-6">
               {/* Contact Information */}
-              <div className="bg-gray-800 p-6 rounded-lg border border-gray-800">
-                <h3 className="text-lg font-semibold text-white mb-4">Contact Information</h3>
+              <div className="bg-gray-800 p-6 rounded-lg border border-gray-700 hover:border-blue-600/50 transition-colors">
+                <div className="flex items-center space-x-2 mb-4">
+                  <MdPhone className="w-5 h-5 text-gray-400" />
+                  <h3 className="text-lg font-semibold text-white">Contact Information</h3>
+                </div>
                 
                 <div className="space-y-4">
-                  <div>
-                    <h4 className="text-white font-medium mb-2">📧 Email Support</h4>
-                    <p className="text-gray-400 text-sm">support@scholarbase.ng</p>
-                    <p className="text-gray-400 text-sm">Response within 24 hours</p>
+                  <div className="flex items-start space-x-3 p-3 bg-blue-600/10 rounded-lg border border-blue-600/20">
+                    <MdEmail className="w-5 h-5 text-blue-400 mt-1" />
+                    <div>
+                      <h4 className="text-white font-medium mb-1">Email Support</h4>
+                      <p className="text-gray-400 text-sm">support@scholarbase.ng</p>
+                      <p className="text-gray-400 text-sm">Response within 24 hours</p>
+                    </div>
                   </div>
                   
-                  <div>
-                    <h4 className="text-white font-medium mb-2">📞 Phone Support</h4>
-                    <p className="text-gray-400 text-sm">+234 901 234 5678</p>
-                    <p className="text-gray-400 text-sm">Mon-Fri, 9AM-6PM WAT</p>
+                  <div className="flex items-start space-x-3 p-3 bg-emerald-600/10 rounded-lg border border-emerald-600/20">
+                    <MdPhone className="w-5 h-5 text-emerald-400 mt-1" />
+                    <div>
+                      <h4 className="text-white font-medium mb-1">Phone Support</h4>
+                      <p className="text-gray-400 text-sm">+234 901 234 5678</p>
+                      <p className="text-gray-400 text-sm">Mon-Fri, 9AM-6PM WAT</p>
+                    </div>
                   </div>
                   
-                  <div>
-                    <h4 className="text-white font-medium mb-2">💬 Live Chat</h4>
-                    <p className="text-gray-400 text-sm">Available on website</p>
-                    <p className="text-gray-400 text-sm">Mon-Fri, 9AM-6PM WAT</p>
+                  <div className="flex items-start space-x-3 p-3 bg-purple-600/10 rounded-lg border border-purple-600/20">
+                    <MdChat className="w-5 h-5 text-purple-400 mt-1" />
+                    <div>
+                      <h4 className="text-white font-medium mb-1">Live Chat</h4>
+                      <p className="text-gray-400 text-sm">Available on website</p>
+                      <p className="text-gray-400 text-sm">Mon-Fri, 9AM-6PM WAT</p>
+                    </div>
                   </div>
                 </div>
               </div>
 
               {/* FAQ */}
-              <div className="bg-gray-800 p-6 rounded-lg border border-gray-800">
-                <h3 className="text-lg font-semibold text-white mb-4">Frequently Asked Questions</h3>
+              <div className="bg-gray-800 p-6 rounded-lg border border-gray-700 hover:border-yellow-600/50 transition-colors">
+                <div className="flex items-center space-x-2 mb-4">
+                  <MdHelpOutline className="w-5 h-5 text-gray-400" />
+                  <h3 className="text-lg font-semibold text-white">Frequently Asked Questions</h3>
+                </div>
                 
                 <div className="space-y-4">
                   <div>
@@ -134,30 +162,33 @@ function Support() {
               </div>
 
               {/* Status */}
-              <div className="bg-gray-800 p-6 rounded-lg border border-gray-800">
-                <h3 className="text-lg font-semibold text-white mb-4">System Status</h3>
+              <div className="bg-gray-800 p-6 rounded-lg border border-gray-700 hover:border-emerald-600/50 transition-colors">
+                <div className="flex items-center space-x-2 mb-4">
+                  <MdCheckCircle className="w-5 h-5 text-emerald-400" />
+                  <h3 className="text-lg font-semibold text-white">System Status</h3>
+                </div>
                 
                 <div className="space-y-3">
-                  <div className="flex justify-between items-center">
+                  <div className="flex justify-between items-center p-2 bg-emerald-600/10 rounded-lg">
                     <span className="text-gray-300 text-sm">Platform Status</span>
-                    <span className="flex items-center text-green-400 text-sm">
-                      <div className="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
+                    <span className="flex items-center text-emerald-400 text-sm">
+                      <MdCheckCircle className="w-4 h-4 mr-1" />
                       Operational
                     </span>
                   </div>
                   
-                  <div className="flex justify-between items-center">
+                  <div className="flex justify-between items-center p-2 bg-emerald-600/10 rounded-lg">
                     <span className="text-gray-300 text-sm">Payment System</span>
-                    <span className="flex items-center text-green-400 text-sm">
-                      <div className="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
+                    <span className="flex items-center text-emerald-400 text-sm">
+                      <MdCheckCircle className="w-4 h-4 mr-1" />
                       Operational
                     </span>
                   </div>
                   
-                  <div className="flex justify-between items-center">
+                  <div className="flex justify-between items-center p-2 bg-emerald-600/10 rounded-lg">
                     <span className="text-gray-300 text-sm">Video Streaming</span>
-                    <span className="flex items-center text-green-400 text-sm">
-                      <div className="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
+                    <span className="flex items-center text-emerald-400 text-sm">
+                      <MdCheckCircle className="w-4 h-4 mr-1" />
                       Operational
                     </span>
                   </div>
