@@ -1,6 +1,17 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
+import { 
+  MdMenu, 
+  MdClose, 
+  MdDashboard, 
+  MdSchool, 
+  MdAnalytics, 
+  MdPeople, 
+  MdAttachMoney, 
+  MdSupport,
+  MdLogout
+} from 'react-icons/md'
 
 function Sidebar() {
   const location = useLocation()
@@ -22,13 +33,7 @@ function Sidebar() {
         onClick={() => setIsOpen(!isOpen)}
         className="fixed top-4 left-4 z-50 lg:hidden bg-gray-800 hover:bg-gray-700 text-white p-2 rounded-lg shadow-lg transition-colors"
       >
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          {isOpen ? (
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          ) : (
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-          )}
-        </svg>
+        {isOpen ? <MdClose className="w-6 h-6" /> : <MdMenu className="w-6 h-6" />}
       </button>
 
       {/* Mobile overlay */}
@@ -55,14 +60,11 @@ function Sidebar() {
           to="/dashboard" 
           className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 ${
             isActive('/dashboard') 
-              ? 'text-white bg-blue-600 shadow-md' 
-              : 'text-gray-300 hover:text-white hover:bg-gray-700 hover:shadow-sm'
+              ? 'text-white bg-gray-800 shadow-md border border-gray-600' 
+              : 'text-gray-300 hover:text-white hover:bg-gray-800 hover:shadow-sm'
           }`}
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z" />
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5a2 2 0 012-2h2a2 2 0 012 2v.09A2 2 0 0016 7a2 2 0 012 2v.09A2 2 0 0020 11v4a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2z" />
-          </svg>
+          <MdDashboard className="w-5 h-5" />
           <span className="font-medium">Dashboard</span>
         </Link>
         
@@ -70,13 +72,11 @@ function Sidebar() {
           to="/courses" 
           className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 ${
             isActive('/courses') 
-              ? 'text-white bg-blue-600 shadow-md' 
-              : 'text-gray-300 hover:text-white hover:bg-gray-700 hover:shadow-sm'
+              ? 'text-white bg-gray-800 shadow-md border border-gray-600' 
+              : 'text-gray-300 hover:text-white hover:bg-gray-800 hover:shadow-sm'
           }`}
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-          </svg>
+          <MdSchool className="w-5 h-5" />
           <span className="font-medium">Courses</span>
         </Link>
         
@@ -84,13 +84,11 @@ function Sidebar() {
           to="/analytics" 
           className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 ${
             isActive('/analytics') 
-              ? 'text-white bg-blue-600 shadow-md' 
-              : 'text-gray-300 hover:text-white hover:bg-gray-700 hover:shadow-sm'
+              ? 'text-white bg-gray-800 shadow-md border border-gray-600' 
+              : 'text-gray-300 hover:text-white hover:bg-gray-800 hover:shadow-sm'
           }`}
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-          </svg>
+          <MdAnalytics className="w-5 h-5" />
           <span className="font-medium">Analytics</span>
         </Link>
         
@@ -98,13 +96,11 @@ function Sidebar() {
           to="/students-performance" 
           className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 ${
             isActive('/students-performance') 
-              ? 'text-white bg-blue-600 shadow-md' 
-              : 'text-gray-300 hover:text-white hover:bg-gray-700 hover:shadow-sm'
+              ? 'text-white bg-gray-800 shadow-md border border-gray-600' 
+              : 'text-gray-300 hover:text-white hover:bg-gray-800 hover:shadow-sm'
           }`}
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 715 0z" />
-          </svg>
+          <MdPeople className="w-5 h-5" />
           <span className="font-medium">Students</span>
         </Link>
         
@@ -112,13 +108,11 @@ function Sidebar() {
           to="/earnings" 
           className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 ${
             isActive('/earnings') 
-              ? 'text-white bg-blue-600 shadow-md' 
-              : 'text-gray-300 hover:text-white hover:bg-gray-700 hover:shadow-sm'
+              ? 'text-white bg-gray-800 shadow-md border border-gray-600' 
+              : 'text-gray-300 hover:text-white hover:bg-gray-800 hover:shadow-sm'
           }`}
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
-          </svg>
+          <MdAttachMoney className="w-5 h-5" />
           <span className="font-medium">Earnings</span>
         </Link>
         
@@ -126,13 +120,11 @@ function Sidebar() {
           to="/support" 
           className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 ${
             isActive('/support') 
-              ? 'text-white bg-blue-600 shadow-md' 
-              : 'text-gray-300 hover:text-white hover:bg-gray-700 hover:shadow-sm'
+              ? 'text-white bg-gray-800 shadow-md border border-gray-600' 
+              : 'text-gray-300 hover:text-white hover:bg-gray-800 hover:shadow-sm'
           }`}
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192L5.636 18.364M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
+          <MdSupport className="w-5 h-5" />
           <span className="font-medium">Support</span>
         </Link>
       </nav>
@@ -152,9 +144,10 @@ function Sidebar() {
           </div>
           <button 
             onClick={handleLogout}
-            className="text-blue-400 text-sm hover:text-blue-300 transition-colors font-medium"
+            className="text-gray-400 text-sm hover:text-white transition-colors font-medium flex items-center space-x-1"
           >
-            → Logout
+            <MdLogout className="w-4 h-4" />
+            <span>Logout</span>
           </button>
         </div>
       </div>
