@@ -34,6 +34,10 @@ function Login() {
         password: formData.password
       }, 'tutor')
 
+      // Debug: Check if token was saved
+      console.log('Login successful! Token:', localStorage.getItem('access_token'))
+      console.log('User data:', localStorage.getItem('user_data'))
+
       // Redirect to intended page or dashboard
       const from = location.state?.from?.pathname || '/dashboard'
       navigate(from, { replace: true })

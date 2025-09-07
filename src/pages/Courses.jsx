@@ -1,42 +1,73 @@
-import { Link } from 'react-router-dom'
-import { useState } from 'react'
+import { Link, useLocation } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { useAuth } from '../contexts/AuthContext'
+import { courseService } from '../services/courses'
 import Sidebar from '../components/Sidebar'
 
 function Courses() {
+  const { user } = useAuth()
+  const location = useLocation()
   const [activeTab, setActiveTab] = useState('all')
+  const [courses, setCourses] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+  const [successMessage, setSuccessMessage] = useState('')
 
-  const courses = [
-    {
-      id: 1,
-      title: 'Mathematics - WAEC Preparation',
-      subject: 'Mathematics',
-      students: 89,
-      rating: 4.9,
-      status: 'active',
-      earnings: '₦125,000',
-      image: '/class.avif'
-    },
-    {
-      id: 2,
-      title: 'Physics - JAMB Complete Guide',
-      subject: 'Physics',
-      students: 67,
-      rating: 4.8,
-      status: 'active',
-      earnings: '₦98,500',
-      image: '/teaching.avif'
-    },
-    {
-      id: 3,
-      title: 'Advanced Mathematics - Further Math',
-      subject: 'Further Mathematics',
-      students: 23,
-      rating: 4.7,
-      status: 'draft',
-      earnings: '₦0',
-      image: '/classs.avif'
+  useEffect(() => {
+    // Check for success message from navigation state
+    if (location.state?.message) {
+      setSuccessMessage(location.state.message)
+      // Clear the message from history
+      window.history.replaceState({}, document.title)
     }
-  ]
+
+    if (user?.id) {
+      loadCourses()
+    }
+  }, [user, location.state])
+
+  const loadCourses = async () => {
+    try {
+      setLoading(true)
+      setError('')
+      
+      const response = await courseService.getTutorCourses(user.id)
+      const coursesData = response.courses || []
+      
+      // Transform API data to match UI expectations
+      const transformedCourses = coursesData.map(course => ({
+        id: course.id,
+        title: course.title,
+        subject: course.category || 'General',
+        students: 0, // Mock data - enrollment endpoint not yet available
+        rating: 4.8, // Mock data - ratings endpoint not yet available
+        status: course.is_published ? 'active' : 'draft',
+        earnings: '₦0', // Mock data - earnings endpoint not yet available
+        price: course.price,
+        image: course.thumbnail_url || '/class.avif',
+        description: course.description,
+        level: course.level,
+        created_at: course.created_at
+      }))
+      
+      setCourses(transformedCourses)
+    } catch (err) {
+      console.error('Load courses error:', err)
+      setError('Failed to load courses')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Auto-hide success message after 5 seconds
+  useEffect(() => {
+    if (successMessage) {
+      const timer = setTimeout(() => {
+        setSuccessMessage('')
+      }, 5000)
+      return () => clearTimeout(timer)
+    }
+  }, [successMessage])
 
   const filteredCourses = courses.filter(course => {
     if (activeTab === 'all') return true
@@ -68,6 +99,20 @@ function Courses() {
               <span>New Course</span>
             </Link>
           </div>
+
+          {/* Success Message */}
+          {successMessage && (
+            <div className="mb-6 p-4 bg-green-600/20 border border-green-600/50 rounded-lg">
+              <p className="text-green-400">{successMessage}</p>
+            </div>
+          )}
+
+          {/* Error Message */}
+          {error && (
+            <div className="mb-6 p-4 bg-red-600/20 border border-red-600/50 rounded-lg">
+              <p className="text-red-400">{error}</p>
+            </div>
+          )}
 
           {/* Tabs */}
           <div className="flex space-x-1 bg-gray-800 p-1 rounded mb-4 w-fit">
@@ -103,9 +148,19 @@ function Courses() {
             </button>
           </div>
 
-          {/* Courses Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
-            {filteredCourses.map(course => (
+          {/* Loading State */}
+          {loading ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
+                <p className="text-white">Loading courses...</p>
+              </div>
+            </div>
+          ) : (
+            <>
+              {/* Courses Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
+                {filteredCourses.map(course => (
               <div key={course.id} className="bg-gray-800 rounded-lg overflow-hidden border border-gray-800 hover:border-gray-600 transition-colors">
                 <div className="relative h-48">
                   <img 
@@ -126,7 +181,14 @@ function Courses() {
                 
                 <div className="p-6">
                   <h3 className="text-base font-medium text-white mb-2">{course.title}</h3>
-                  <p className="text-gray-400 text-xs mb-3">{course.subject}</p>
+                  <div className="flex items-center justify-between mb-3">
+                    <p className="text-gray-400 text-xs">{course.subject}</p>
+                    {course.status === 'draft' && (
+                      <span className="text-xs bg-orange-600/20 text-orange-400 px-2 py-1 rounded-full">
+                        Needs Media
+                      </span>
+                    )}
+                  </div>
                   
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center space-x-4">
@@ -143,13 +205,16 @@ function Courses() {
                         <span className="text-gray-300 text-sm">{course.students}</span>
                       </div>
                     </div>
-                    <div className="text-gray-300 text-sm font-medium">{course.earnings}</div>
+                    <div className="text-gray-300 text-sm font-medium">₦{course.price?.toLocaleString() || '0'}</div>
                   </div>
                   
                   <div className="flex space-x-2">
-                    <button className="flex-1 bg-gray-700 hover:bg-gray-600 text-white py-2 px-3 rounded text-xs font-medium transition-colors">
-                      Edit
-                    </button>
+                    <Link 
+                      to={`/courses/${course.id}/edit`} 
+                      className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-3 rounded text-xs font-medium transition-colors text-center"
+                    >
+                      {course.status === 'draft' ? 'Add Media' : 'Edit'}
+                    </Link>
                     <button className="bg-gray-700 hover:bg-gray-600 text-white py-2 px-3 rounded text-xs font-medium transition-colors">
                       Stats
                     </button>
@@ -157,25 +222,31 @@ function Courses() {
                 </div>
               </div>
             ))}
-          </div>
+              </div>
 
-          {filteredCourses.length === 0 && (
-            <div className="text-center py-12">
-              <svg className="w-16 h-16 text-gray-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-              </svg>
-              <h3 className="text-xl font-semibold text-white mb-2">No courses found</h3>
-              <p className="text-gray-400 mb-4">Get started by creating your first course</p>
-              <Link 
-                to="/courses/create"
-                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors inline-flex items-center space-x-2"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                </svg>
-                <span>Create New Course</span>
-              </Link>
-            </div>
+              {filteredCourses.length === 0 && (
+                <div className="text-center py-12">
+                  <svg className="w-16 h-16 text-gray-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                  </svg>
+                  <h3 className="text-xl font-semibold text-white mb-2">
+                    {activeTab === 'all' && 'No courses found'}
+                    {activeTab === 'active' && 'No published courses'}
+                    {activeTab === 'draft' && 'No draft courses'}
+                  </h3>
+                  <p className="text-gray-400 mb-4">Get started by creating your first course</p>
+                  <Link 
+                    to="/courses/create"
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors inline-flex items-center space-x-2"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                    </svg>
+                    <span>Create New Course</span>
+                  </Link>
+                </div>
+              )}
+            </>
           )}
         </main>
       </div>

@@ -4,7 +4,10 @@ export const courseService = {
   // Course Management
   async createCourse(courseData) {
     try {
+      console.log('Creating course with data:', courseData);
       const response = await apiClient.post('/api/courses', courseData);
+      console.log('Course creation response:', response);
+      console.log('🔍 Thumbnail in response:', response.course?.thumbnail_url || response.course?.thumbnail || 'NOT FOUND');
       return response;
     } catch (error) {
       console.error('Create course error:', error);
@@ -32,7 +35,10 @@ export const courseService = {
 
   async getCourseById(courseId) {
     try {
+      console.log('🔍 Fetching course by ID:', courseId);
+      console.log('🔗 API endpoint:', `/api/courses/${courseId}`);
       const response = await apiClient.get(`/api/courses/${courseId}`);
+      console.log('📦 Course response:', response);
       return response;
     } catch (error) {
       console.error('Get course by ID error:', error);

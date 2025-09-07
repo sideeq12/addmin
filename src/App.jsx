@@ -12,6 +12,7 @@ import Signup from './pages/Signup'
 import Dashboard from './pages/Dashboard'
 import Courses from './pages/Courses'
 import CreateCourse from './pages/CreateCourse'
+import EditCourse from './pages/EditCourse'
 import Analytics from './pages/Analytics'
 import StudentsPerformance from './pages/StudentsPerformance'
 import Earnings from './pages/Earnings'
@@ -94,6 +95,11 @@ function App() {
           <Route path="/courses/create" element={
             <ProtectedRoute requiredUserType="tutor">
               <CreateCourse />
+            </ProtectedRoute>
+          } />
+          <Route path="/courses/:courseId/edit" element={
+            <ProtectedRoute requiredUserType="tutor">
+              <EditCourse />
             </ProtectedRoute>
           } />
           <Route path="/analytics" element={

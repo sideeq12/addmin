@@ -5,7 +5,7 @@ export const uploadService = {
   async uploadVideo(videoFile, onProgress = null) {
     try {
       const formData = new FormData();
-      formData.append('video', videoFile);
+      formData.append('file', videoFile);
 
       // Create XMLHttpRequest for progress tracking
       return new Promise((resolve, reject) => {
@@ -50,13 +50,14 @@ export const uploadService = {
         // Set timeout to 5 minutes
         xhr.timeout = 300000;
 
-        // Add authorization header if available
+        xhr.open('POST', `${apiClient.baseURL}/api/uploads/video`);
+        
+        // Add authorization header after opening the request
         const token = localStorage.getItem('access_token');
         if (token) {
           xhr.setRequestHeader('Authorization', `Bearer ${token}`);
         }
 
-        xhr.open('POST', `${apiClient.baseURL}/api/uploads/video`);
         xhr.send(formData);
       });
     } catch (error) {
@@ -69,7 +70,7 @@ export const uploadService = {
   async uploadImage(imageFile, onProgress = null) {
     try {
       const formData = new FormData();
-      formData.append('image', imageFile);
+      formData.append('file', imageFile);
 
       return new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
@@ -85,19 +86,23 @@ export const uploadService = {
         }
 
         xhr.addEventListener('load', () => {
+          console.log('Image upload response status:', xhr.status);
+          console.log('Image upload response text:', xhr.responseText);
+          
           if (xhr.status === 200) {
             try {
               const response = JSON.parse(xhr.responseText);
               resolve(response);
             } catch (error) {
+              console.error('JSON parse error:', error);
               reject(new Error('Invalid response format'));
             }
           } else {
             try {
               const errorResponse = JSON.parse(xhr.responseText);
-              reject(new Error(errorResponse.error || 'Upload failed'));
+              reject(new Error(errorResponse.error || `Upload failed with status ${xhr.status}`));
             } catch {
-              reject(new Error('Upload failed'));
+              reject(new Error(`Upload failed with status ${xhr.status}`));
             }
           }
         });
@@ -113,13 +118,14 @@ export const uploadService = {
         // Set timeout to 2 minutes for images
         xhr.timeout = 120000;
 
-        // Add authorization header if available
+        xhr.open('POST', `${apiClient.baseURL}/api/uploads/image`);
+        
+        // Add authorization header after opening the request
         const token = localStorage.getItem('access_token');
         if (token) {
           xhr.setRequestHeader('Authorization', `Bearer ${token}`);
         }
 
-        xhr.open('POST', `${apiClient.baseURL}/api/uploads/image`);
         xhr.send(formData);
       });
     } catch (error) {

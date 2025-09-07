@@ -20,14 +20,25 @@ class ApiClient {
     const token = localStorage.getItem('access_token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+      console.log('API Request - Token added:', token.substring(0, 20) + '...');
+    } else {
+      console.log('API Request - No token found');
     }
 
     try {
+      console.log('🌐 Making API request:', { method: config.method || 'GET', url });
       const response = await fetch(url, config);
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || data.message || 'API request failed');
+        console.error('🚨 API Error Response:', {
+          status: response.status,
+          statusText: response.statusText,
+          data: data,
+          url: url,
+          headers: config.headers
+        });
+        throw new Error(data.error || data.message || `API request failed with status ${response.status}`);
       }
 
       return data;
