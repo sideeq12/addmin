@@ -98,7 +98,7 @@ function Courses() {
         <Sidebar />
 
         {/* Main Content */}
-        <main className="flex-1 lg:ml-56 p-4 lg:p-6">
+        <main className="flex-1 lg:ml-56 pl-8 p-4 lg:p-6">
           {/* Header */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
             <div>

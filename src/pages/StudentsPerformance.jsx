@@ -21,7 +21,7 @@ function StudentsPerformance() {
         <Sidebar />
 
         {/* Main Content */}
-        <main className="flex-1 lg:ml-56 p-4 lg:p-6">
+        <main className="flex-1 lg:ml-56 pl-8 p-4 lg:p-6">
           <div className="mb-6">
             <h1 className="text-xl font-semibold text-white mb-1">Students Performance</h1>
             <p className="text-sm text-gray-400">Track student progress and achievements</p>

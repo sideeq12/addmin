@@ -53,13 +53,16 @@ export const uploadService = {
         xhr.open('POST', `${apiClient.baseURL}/api/uploads/video`);
         
         // Add authorization header after opening the request
+
+        console.log('Video upload request opened');
         const token = localStorage.getItem('access_token');
         if (token) {
           xhr.setRequestHeader('Authorization', `Bearer ${token}`);
         }
 
         xhr.send(formData);
-      });
+        console.log('Video upload request sent')
+      } );
     } catch (error) {
       console.error('Video upload error:', error);
       throw error;
@@ -141,6 +144,30 @@ export const uploadService = {
       return response;
     } catch (error) {
       console.error('Get file URL error:', error);
+      throw error;
+    }
+  },
+
+  // Create Video Record
+  async createVideoRecord(videoData) {
+    try {
+      console.log('Creating video record with data:', videoData);
+      
+      const response = await apiClient.post('/api/videos', {
+        course_id: videoData.course_id,
+        section_id: videoData.section_id,
+        title: videoData.title,
+        description: videoData.description,
+        videoUrl: videoData.videoUrl,
+        duration: videoData.duration,
+        position: videoData.position,
+        preview: videoData.preview || false
+      });
+
+      console.log('Video record created successfully:', response);
+      return response;
+    } catch (error) {
+      console.error('Create video record error:', error);
       throw error;
     }
   },

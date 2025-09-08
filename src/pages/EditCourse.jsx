@@ -6,23 +6,27 @@ import { uploadService } from '../services/upload'
 import Sidebar from '../components/Sidebar'
 import { 
   MdAdd, 
-  MdEdit, 
   MdDelete, 
-  MdVideoLibrary, 
-  MdExpandMore, 
-  MdOpenInNew, 
-  MdArrowBack, 
-  MdCheckCircle, 
-  MdUploadFile,
-  MdFolder,
-  MdPlayArrow,
-  MdAccessTime,
-  MdLabel,
-  MdTrendingUp,
-  MdSchool,
-  MdAttachMoney,
+  MdVideoLibrary,
   MdImage,
-  MdClose
+  MdArrowBack,
+  MdExpandMore,
+  MdExpandLess,
+  MdPlayArrow,
+  MdDescription,
+  MdSettings,
+  MdPublish,
+  MdVisibility,
+  MdSchedule,
+  MdPeople,
+  MdTrendingUp,
+  MdFolder,
+  MdCloudUpload,
+  MdEdit,
+  MdSave,
+  MdMoreVert,
+  MdClose,
+  MdFullscreen
 } from 'react-icons/md'
 
 function EditCourse() {
@@ -32,7 +36,6 @@ function EditCourse() {
   const [loading, setLoading] = useState(false)
   const [pageLoading, setPageLoading] = useState(true)
   const [error, setError] = useState('')
-  const [uploadProgress, setUploadProgress] = useState(0)
   
   const [formData, setFormData] = useState({
     title: '',
@@ -40,46 +43,38 @@ function EditCourse() {
     category: '',
     level: 'beginner',
     price: 0,
-    thumbnail: null,
     thumbnailUrl: '',
     isPublished: false
   })
 
-  // Section management state
   const [sections, setSections] = useState([])
-  const [sectionsLoading, setSectionsLoading] = useState(false)
   const [showAddSection, setShowAddSection] = useState(false)
   const [newSection, setNewSection] = useState({
-    title: '',
-    resources: ''
+    title: ''
   })
+  const [expandedSections, setExpandedSections] = useState({})
+  const [showAddVideo, setShowAddVideo] = useState({})
+  const [newVideo, setNewVideo] = useState({
+    title: '',
+    description: '',
+    videoFile: null,
+    preview: false
+  })
+  const [uploadProgress, setUploadProgress] = useState(0)
+  const [uploadingVideo, setUploadingVideo] = useState(false)
+  const [showVideoPlayer, setShowVideoPlayer] = useState(false)
+  const [currentVideo, setCurrentVideo] = useState(null)
 
-  const categories = [
-    'Mathematics', 'Science', 'English', 'History', 'Geography',
-    'Computer Science', 'Art', 'Music', 'Physical Education', 'Language'
-  ]
-
-  const levels = [
-    { value: 'beginner', label: 'Beginner' },
-    { value: 'intermediate', label: 'Intermediate' },
-    { value: 'advanced', label: 'Advanced' }
-  ]
-
-  // Load course data and sections
+  // Load course data
   useEffect(() => {
     const loadCourse = async () => {
       try {
         setPageLoading(true)
         setError('')
         
-        console.log('Loading course with ID:', courseId)
         const response = await courseService.getCourseById(courseId)
-        console.log('Course API response:', response)
-        console.log('Response has ID:', !!response.id)
-        console.log('Response keys:', Object.keys(response))
         
         if (response && (response.id || response.title)) {
-          // The response IS the course object directly
           const course = response
           setFormData({
             title: course.title || '',
@@ -87,193 +82,91 @@ function EditCourse() {
             category: course.category || '',
             level: course.level ? course.level.toLowerCase() : 'beginner',
             price: course.price || 0,
-            thumbnail: null,
             thumbnailUrl: course.thumbnail || course.thumbnail_url || '',
             isPublished: course.is_published || false
           })
           
-          console.log('✅ Course data loaded successfully:', course.title)
-          
-          // Load sections
           await loadSections()
         } else {
           setError('Course not found')
         }
       } catch (err) {
         console.error('Load course error:', err)
-        setError(`Failed to load course data: ${err.message}`)
+        setError('Failed to load course')
       } finally {
         setPageLoading(false)
       }
     }
 
-    if (courseId) {
+    if (courseId && user?.id) {
       loadCourse()
     }
-  }, [courseId])
+  }, [courseId, user])
 
-  // Load sections
   const loadSections = async () => {
     try {
-      setSectionsLoading(true)
       const response = await courseService.getCourseSections(courseId)
+      const sectionsData = response.sections || []
       
-      if (response.sections) {
-        const sortedSections = response.sections.sort((a, b) => a.position - b.position)
-        setSections(sortedSections)
-        
-        // Load videos for each section
-        for (const section of sortedSections) {
-          await loadSectionVideos(section.id)
-        }
-      }
+      // Fetch videos for each section
+      const sectionsWithVideos = await Promise.all(
+        sectionsData.map(async (section) => {
+          try {
+            const videosResponse = await courseService.getSectionVideos(section.id)
+            return {
+              ...section,
+              videos: videosResponse.videos || []
+            }
+          } catch (error) {
+            console.error(`Error loading videos for section ${section.id}:`, error)
+            return {
+              ...section,
+              videos: []
+            }
+          }
+        })
+      )
+      
+      setSections(sectionsWithVideos)
     } catch (err) {
       console.error('Load sections error:', err)
-    } finally {
-      setSectionsLoading(false)
     }
-  }
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target
-    setFormData(prev => ({
-      ...prev,
-      [name]: name === 'price' ? parseFloat(value) || 0 : value
-    }))
-  }
-
-  const handleFileChange = (e) => {
-    const file = e.target.files[0]
-    if (file) {
-      try {
-        uploadService.validateImageFile(file)
-        setFormData(prev => ({
-          ...prev,
-          thumbnail: file
-        }))
-        setError('')
-      } catch (err) {
-        setError(err.message)
-        e.target.value = ''
-      }
-    }
-  }
-
-  // Video management state
-  const [sectionVideos, setSectionVideos] = useState({}) // Store videos by section ID
-  const [videosLoading, setVideosLoading] = useState(false)
-  const [showAddVideo, setShowAddVideo] = useState(false)
-  const [selectedSectionId, setSelectedSectionId] = useState('')
-  const [expandedVideos, setExpandedVideos] = useState({}) // Track expanded video previews
-  const [newVideo, setNewVideo] = useState({
-    title: '',
-    description: '',
-    videoFile: null
-  })
-
-  // Load videos for a section
-  const loadSectionVideos = async (sectionId) => {
-    try {
-      setVideosLoading(true)
-      console.log('Loading videos for section:', sectionId)
-      
-      const response = await courseService.getSectionVideos(sectionId)
-      console.log('Section videos response:', response)
-      
-      if (response.videos) {
-        const sortedVideos = response.videos.sort((a, b) => a.position - b.position)
-        setSectionVideos(prev => ({
-          ...prev,
-          [sectionId]: sortedVideos
-        }))
-        console.log(`✅ Loaded ${sortedVideos.length} videos for section ${sectionId}`)
-      } else if (response.length >= 0) {
-        // Handle case where response is an array directly
-        const sortedVideos = response.sort((a, b) => a.position - b.position)
-        setSectionVideos(prev => ({
-          ...prev,
-          [sectionId]: sortedVideos
-        }))
-        console.log(`✅ Loaded ${sortedVideos.length} videos for section ${sectionId}`)
-      } else {
-        setSectionVideos(prev => ({
-          ...prev,
-          [sectionId]: []
-        }))
-      }
-    } catch (err) {
-      console.error('Load videos error:', err)
-      setSectionVideos(prev => ({
-        ...prev,
-        [sectionId]: []
-      }))
-    } finally {
-      setVideosLoading(false)
-    }
-  }
-
-  // Load videos for all sections
-  const loadAllSectionVideos = async () => {
-    for (const section of sections) {
-      await loadSectionVideos(section.id)
-    }
-  }
-
-  // Section management functions
-  const handleNewSectionChange = (e) => {
-    const { name, value } = e.target
-    setNewSection(prev => ({
-      ...prev,
-      [name]: value
-    }))
   }
 
   const handleAddSection = async (e) => {
     e.preventDefault()
-    
-    if (!newSection.title.trim()) {
-      setError('Section title is required')
-      return
-    }
+    if (!newSection.title.trim()) return
 
     try {
       setLoading(true)
       setError('')
 
-      const sectionData = {
-        course_id: courseId,
-        title: newSection.title.trim(),
-        position: sections.length + 1,
-        resources: newSection.resources.trim() || null
-      }
+      const response = await courseService.addSection(courseId, {
+        title: newSection.title,
+        resources: ''
+      })
 
-      console.log('Creating section:', sectionData)
-      const response = await courseService.createSection(sectionData)
+      console.log('Add section response in EditCourse:', response)
 
-      if (response.success || response.section) {
-        // Reload sections
+      // Handle different response formats
+      if (response.success || response.section || response.id) {
         await loadSections()
-        
-        // Reset form
-        setNewSection({ title: '', resources: '' })
+        setNewSection({ title: '' })
         setShowAddSection(false)
-        
-        console.log('✅ Section created successfully')
+        console.log('✅ Section added successfully')
       } else {
-        throw new Error(response.error || 'Failed to create section')
+        throw new Error(response.error || response.message || 'Failed to add section')
       }
     } catch (err) {
-      console.error('Create section error:', err)
-      setError(err.message || 'Failed to create section')
+      console.error('Add section error:', err)
+      setError(err.message || 'Failed to add section')
     } finally {
       setLoading(false)
     }
   }
 
   const handleDeleteSection = async (sectionId) => {
-    if (!confirm('Are you sure you want to delete this section?')) {
-      return
-    }
+    if (!confirm('Are you sure you want to delete this section?')) return
 
     try {
       setLoading(true)
@@ -283,7 +176,6 @@ function EditCourse() {
       
       if (response.success) {
         await loadSections()
-        console.log('✅ Section deleted successfully')
       } else {
         throw new Error(response.error || 'Failed to delete section')
       }
@@ -295,39 +187,56 @@ function EditCourse() {
     }
   }
 
-  // Video management functions
-  const handleNewVideoChange = (e) => {
-    const { name, value } = e.target
-    setNewVideo(prev => ({
+  const handleNewSectionChange = (e) => {
+    setNewSection({ title: e.target.value })
+  }
+
+  const toggleSectionExpanded = (sectionId) => {
+    setExpandedSections(prev => ({
       ...prev,
-      [name]: value
+      [sectionId]: !prev[sectionId]
     }))
   }
 
-  const handleVideoFileChange = (e) => {
-    const file = e.target.files[0]
-    if (file) {
-      try {
-        uploadService.validateVideoFile(file)
-        setNewVideo(prev => ({
-          ...prev,
-          videoFile: file
-        }))
-        setError('')
-      } catch (err) {
-        setError(err.message)
-        e.target.value = ''
+  const toggleAddVideo = (sectionId) => {
+    setShowAddVideo(prev => ({
+      ...prev,
+      [sectionId]: !prev[sectionId]
+    }))
+  }
+
+  const handleNewVideoChange = (e) => {
+    const { name, value, type, checked, files } = e.target
+    
+    if (type === 'checkbox') {
+      setNewVideo(prev => ({
+        ...prev,
+        [name]: checked
+      }))
+    } else if (type === 'file') {
+      const file = files[0]
+      if (file) {
+        try {
+          uploadService.validateVideoFile(file)
+          setNewVideo(prev => ({
+            ...prev,
+            videoFile: file
+          }))
+          setError('')
+        } catch (err) {
+          setError(err.message)
+        }
       }
+    } else {
+      setNewVideo(prev => ({
+        ...prev,
+        [name]: value
+      }))
     }
   }
 
-  const handleAddVideo = async (e) => {
+  const handleAddVideo = async (e, sectionId) => {
     e.preventDefault()
-    
-    if (!selectedSectionId) {
-      setError('Please select a section')
-      return
-    }
     
     if (!newVideo.title.trim()) {
       setError('Video title is required')
@@ -340,151 +249,98 @@ function EditCourse() {
     }
 
     try {
-      setLoading(true)
-      setError('')
+      setUploadingVideo(true)
       setUploadProgress(0)
+      setError('')
 
-      // First upload the video
-      console.log('Uploading video:', newVideo.videoFile.name)
-      
+      console.log('🎬 Starting video upload process...')
+      console.log('Video file:', newVideo.videoFile.name, newVideo.videoFile.size)
+
+      // Step 1: Upload video file to get URL
       const uploadResponse = await uploadService.uploadVideo(
         newVideo.videoFile,
         (progress) => setUploadProgress(progress)
       )
-      
-      console.log('Video upload response:', uploadResponse)
-      
+
+      console.log('📤 Video upload response:', uploadResponse)
+
       if (!uploadResponse.success || !uploadResponse.url) {
-        throw new Error('Failed to upload video file')
+        throw new Error('Video upload failed - no URL returned')
       }
 
-      // Create video record
+      // Step 2: Create video record using the URL from step 1
       const videoData = {
         course_id: courseId,
-        section_id: selectedSectionId,
-        title: newVideo.title.trim(),
-        description: newVideo.description.trim() || null,
-        videoUrl: uploadResponse.url,
-        duration: "0:00", // Default duration, can be updated later
-        position: (sectionVideos[selectedSectionId]?.length || 0) + 1,
-        preview: false
+        section_id: sectionId,
+        title: newVideo.title,
+        description: newVideo.description,
+        videoUrl: uploadResponse.url, // Use the actual URL from upload response
+        duration: "10:30", // TODO: Extract actual video duration
+        position: 1, // TODO: Calculate proper position based on existing videos
+        preview: newVideo.preview
       }
 
-      console.log('Creating video with data:', videoData)
-      const response = await courseService.createVideo(videoData)
+      console.log('🎥 Creating video record with data:', videoData)
+      
+      const response = await uploadService.createVideoRecord(videoData)
 
-      if (response.success || response.video) {
-        // Reload videos for the section
-        await loadSectionVideos(selectedSectionId)
-        
-        // Reset form
-        setNewVideo({ title: '', description: '', videoFile: null })
-        setShowAddVideo(false)
-        setSelectedSectionId('')
-        
-        console.log('✅ Video created successfully')
+      // Handle different response formats
+      if (response.success || response.video || response.id) {
+        await loadSections() // Reload sections to show new video
+        setNewVideo({
+          title: '',
+          description: '',
+          videoFile: null,
+          preview: false
+        })
+        setShowAddVideo(prev => ({
+          ...prev,
+          [sectionId]: false
+        }))
+        console.log('✅ Video added successfully')
       } else {
-        throw new Error(response.error || 'Failed to create video')
+        throw new Error(response.error || response.message || 'Failed to add video')
       }
+
     } catch (err) {
-      console.error('Create video error:', err)
-      setError(err.message || 'Failed to create video')
+      console.error('Video upload error:', err)
+      setError(err.message || 'Failed to upload video')
     } finally {
-      setLoading(false)
+      setUploadingVideo(false)
       setUploadProgress(0)
     }
   }
 
-  const handleDeleteVideo = async (videoId) => {
-    if (!confirm('Are you sure you want to delete this video?')) {
-      return
-    }
-
-    try {
-      setLoading(true)
-      setError('')
-
-      const response = await courseService.deleteVideo(videoId)
-      
-      if (response.success) {
-        // Reload all section videos
-        await loadAllSectionVideos()
-        console.log('✅ Video deleted successfully')
-      } else {
-        throw new Error(response.error || 'Failed to delete video')
-      }
-    } catch (err) {
-      console.error('Delete video error:', err)
-      setError(err.message || 'Failed to delete video')
-    } finally {
-      setLoading(false)
-    }
+  const handlePlayVideo = (video) => {
+    setCurrentVideo(video)
+    setShowVideoPlayer(true)
   }
 
-  const toggleVideoPreview = (videoId) => {
-    setExpandedVideos(prev => ({
-      ...prev,
-      [videoId]: !prev[videoId]
-    }))
+  const handleCloseVideoPlayer = () => {
+    setShowVideoPlayer(false)
+    setCurrentVideo(null)
   }
 
-  const handlePublishCourse = async () => {
-    if (!confirm('Are you sure you want to publish this course? Once published, it will be visible to students.')) {
-      return
+  // Handle keyboard events for video player
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape' && showVideoPlayer) {
+        handleCloseVideoPlayer()
+      }
     }
 
-    try {
-      setLoading(true)
-      setError('')
-
-      console.log('Publishing course:', courseId)
-      
-      // Update course to set is_published = true
-      // Send complete course data matching API specification
-      const publishData = {
-        title: String(formData.title || ""),
-        description: String(formData.description || ""),
-        price: Number(formData.price || 0),
-        level: String(formData.level ? formData.level.charAt(0).toUpperCase() + formData.level.slice(1) : "Beginner"),
-        category: String(formData.category || ""),
-        is_published: Boolean(true),
-        featured: Boolean(false),
-        thumbnail: String(formData.thumbnailUrl || ""),
-        requirements: String(""),
-        issue_certificate: Boolean(false),
-        downloadable_material: String(""),
-        objectives: String(""),
-        instructor: String(`${user?.first_name || ""} ${user?.last_name || ""}`).trim(),
-        original_price: Number(formData.price || 0),
-        duration_hours: Number(0),
-        tags: Array.isArray([]) ? [] : []
-      }
-
-      const response = await courseService.updateCourse(courseId, publishData)
-      console.log('Publish course response:', response)
-
-      if (response.success || response.course) {
-        console.log('✅ Course published successfully')
-        navigate('/courses', {
-          state: { message: 'Course published successfully! It is now visible to students.' }
-        })
-      } else {
-        throw new Error(response.error || 'Failed to publish course')
-      }
-    } catch (err) {
-      console.error('Publish course error:', err)
-      setError(err.message || 'Failed to publish course')
-    } finally {
-      setLoading(false)
+    if (showVideoPlayer) {
+      document.addEventListener('keydown', handleKeyDown)
+      return () => document.removeEventListener('keydown', handleKeyDown)
     }
-  }
+  }, [showVideoPlayer])
 
   if (pageLoading) {
     return (
       <div className="min-h-screen bg-black">
         <div className="flex">
           <Sidebar />
-          <main className="flex-1 lg:ml-56 p-4 lg:p-6 flex items-center justify-center">
+          <main className="flex-1 lg:ml-56 pl-8 p-4 lg:p-6 flex items-center justify-center">
             <div className="text-center">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
               <p className="text-white">Loading course...</p>
@@ -500,548 +356,555 @@ function EditCourse() {
       <div className="flex">
         <Sidebar />
 
-        <main className="flex-1 lg:ml-56 min-h-screen">
-          <div className="max-w-full px-6 py-8">
-            <div className="mb-8">
-              <h1 className="text-3xl font-bold text-white mb-3">Course Editor</h1>
-              <p className="text-gray-400 text-lg">Manage sections and videos for your course</p>
+        <main className="flex-1 lg:ml-56 bg-black min-h-screen">
+          {/* Header Bar */}
+          <div className="bg-gray-900 border-b border-gray-700 px-8 py-4 sticky top-0 z-10">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <button
+                  onClick={() => navigate('/courses')}
+                  className="flex items-center space-x-2 px-3 py-2 text-gray-300 hover:bg-gray-800 rounded-lg transition-colors"
+                >
+                  <MdArrowBack className="w-4 h-4" />
+                  <span className="text-sm font-medium">Back to Courses</span>
+                </button>
+                <div className="w-px h-6 bg-gray-600"></div>
+                <div>
+                  <h1 className="text-xl font-semibold text-white">Course Editor</h1>
+                  <p className="text-gray-400 text-sm">{formData.title || 'Untitled Course'}</p>
+                </div>
+              </div>
+              <div className="flex items-center space-x-3">
+                {formData.isPublished ? (
+                  <div className="flex items-center space-x-2 px-3 py-1.5 bg-emerald-900/30 border border-emerald-700/50 rounded-lg">
+                    <div className="w-2 h-2 bg-emerald-400 rounded-full"></div>
+                    <span className="text-emerald-300 text-sm font-medium">Published</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center space-x-2 px-3 py-1.5 bg-amber-900/30 border border-amber-700/50 rounded-lg">
+                    <div className="w-2 h-2 bg-amber-400 rounded-full"></div>
+                    <span className="text-amber-300 text-sm font-medium">Draft</span>
+                  </div>
+                )}
+                <button className="flex items-center space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors text-sm font-medium">
+                  <MdSave className="w-4 h-4" />
+                  <span>Save Changes</span>
+                </button>
+                <button className="p-2 text-gray-400 hover:text-gray-300 hover:bg-gray-800 rounded-lg transition-colors">
+                  <MdMoreVert className="w-5 h-5" />
+                </button>
+              </div>
             </div>
+          </div>
+
+          <div className="px-8 py-6 max-w-7xl mx-auto">
 
             {error && (
-              <div className="mb-6 p-4 bg-red-600/20 border border-red-600/50 rounded-lg">
-                <p className="text-red-400">{error}</p>
+              <div className="mb-6 p-4 bg-red-900/30 border border-red-700/50 rounded-lg">
+                <p className="text-red-400 text-sm">{error}</p>
               </div>
             )}
 
-            {/* Course Overview (Read-only) */}
-            <div className="bg-gray-900 rounded-xl p-8 border border-gray-700 mb-8 shadow-xl">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-semibold text-white">Course Overview</h2>
-                <div className="flex items-center space-x-2">
-                  {formData.isPublished ? (
-                    <span className="px-3 py-1 bg-green-600/20 text-green-400 text-sm font-medium rounded-full border border-green-600/30">
-                      Published
-                    </span>
-                  ) : (
-                    <span className="px-3 py-1 bg-yellow-600/20 text-yellow-400 text-sm font-medium rounded-full border border-yellow-600/30">
-                      Draft
-                    </span>
-                  )}
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
-                {/* Course Thumbnail */}
-                <div className="xl:col-span-1">
-                  {formData.thumbnailUrl ? (
-                    <img 
-                      src={formData.thumbnailUrl} 
-                      alt="Course thumbnail"
-                      className="w-full h-48 xl:h-56 object-cover rounded-xl border border-gray-600 shadow-lg"
-                    />
-                  ) : (
-                    <div className="w-full h-48 xl:h-56 bg-gray-800 rounded-xl border border-gray-600 flex items-center justify-center">
-                      <MdImage className="w-16 h-16 text-gray-600" />
-                    </div>
-                  )}
-                </div>
-                
-                {/* Course Details */}
-                <div className="xl:col-span-3 space-y-6">
-                  <div>
-                    <h3 className="text-3xl font-bold text-white leading-tight">{formData.title}</h3>
+            {/* Course Overview Card */}
+            <div className="bg-gray-900 rounded-xl border border-gray-700 shadow-sm mb-6">
+              <div className="p-6">
+                <div className="flex items-start space-x-6">
+                  {/* Course Thumbnail */}
+                  <div className="flex-shrink-0">
+                    {formData.thumbnailUrl ? (
+                      <div className="relative group">
+                        <img 
+                          src={formData.thumbnailUrl} 
+                          alt="Course thumbnail"
+                          className="w-40 h-24 object-cover rounded-lg border border-gray-600"
+                        />
+                        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 rounded-lg transition-all flex items-center justify-center">
+                          <MdEdit className="w-5 h-5 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="w-40 h-24 bg-gray-800 rounded-lg border-2 border-dashed border-gray-600 flex items-center justify-center hover:bg-gray-750 transition-colors cursor-pointer group">
+                        <div className="text-center">
+                          <MdCloudUpload className="w-6 h-6 text-gray-500 group-hover:text-blue-400 mx-auto mb-1" />
+                          <span className="text-xs text-gray-400 group-hover:text-blue-300">Add thumbnail</span>
+                        </div>
+                      </div>
+                    )}
                   </div>
                   
-                  <div>
-                    <p className="text-gray-300 text-lg leading-relaxed">{formData.description}</p>
-                  </div>
-                  
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                    <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700/50">
-                      <div className="flex items-center space-x-3 mb-2">
-                        <MdLabel className="w-5 h-5 text-gray-400" />
-                        <span className="text-gray-400 text-sm font-medium">Category</span>
+                  {/* Course Info */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between mb-4">
+                      <div>
+                        <h2 className="text-xl font-semibold text-white mb-2">{formData.title || 'Untitled Course'}</h2>
+                        <p className="text-gray-300 text-sm leading-relaxed mb-4">{formData.description || 'No description provided'}</p>
                       </div>
-                      <span className="text-white font-semibold">{formData.category}</span>
                     </div>
                     
-                    <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700/50">
-                      <div className="flex items-center space-x-3 mb-2">
-                        <MdTrendingUp className="w-5 h-5 text-gray-400" />
-                        <span className="text-gray-400 text-sm font-medium">Level</span>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                      <div className="bg-gray-800 rounded-lg p-3">
+                        <div className="flex items-center space-x-2 mb-1">
+                          <MdFolder className="w-4 h-4 text-gray-400" />
+                          <span className="text-xs font-medium text-gray-400 uppercase tracking-wide">Category</span>
+                        </div>
+                        <span className="text-sm font-medium text-white">{formData.category || 'Uncategorized'}</span>
                       </div>
-                      <span className="text-white font-semibold capitalize">{formData.level}</span>
-                    </div>
-                    
-                    <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700/50">
-                      <div className="flex items-center space-x-3 mb-2">
-                        <MdAttachMoney className="w-5 h-5 text-gray-400" />
-                        <span className="text-gray-400 text-sm font-medium">Price</span>
+                      <div className="bg-gray-800 rounded-lg p-3">
+                        <div className="flex items-center space-x-2 mb-1">
+                          <MdTrendingUp className="w-4 h-4 text-gray-400" />
+                          <span className="text-xs font-medium text-gray-400 uppercase tracking-wide">Level</span>
+                        </div>
+                        <span className="text-sm font-medium text-white capitalize">{formData.level}</span>
                       </div>
-                      <span className="text-white font-semibold">₦{formData.price?.toLocaleString() || '0'}</span>
-                    </div>
-                    
-                    <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700/50">
-                      <div className="flex items-center space-x-3 mb-2">
-                        <MdSchool className="w-5 h-5 text-gray-400" />
-                        <span className="text-gray-400 text-sm font-medium">Sections</span>
+                      <div className="bg-gray-800 rounded-lg p-3">
+                        <div className="flex items-center space-x-2 mb-1">
+                          <MdPeople className="w-4 h-4 text-gray-400" />
+                          <span className="text-xs font-medium text-gray-400 uppercase tracking-wide">Price</span>
+                        </div>
+                        <span className="text-sm font-medium text-white">₦{formData.price?.toLocaleString() || '0'}</span>
                       </div>
-                      <span className="text-white font-semibold">{sections.length}</span>
+                      <div className="bg-gray-800 rounded-lg p-3">
+                        <div className="flex items-center space-x-2 mb-1">
+                          <MdVideoLibrary className="w-4 h-4 text-gray-400" />
+                          <span className="text-xs font-medium text-gray-400 uppercase tracking-wide">Sections</span>
+                        </div>
+                        <span className="text-sm font-medium text-white">{sections.length}</span>
+                      </div>
+                      <div className="bg-gray-800 rounded-lg p-3">
+                        <div className="flex items-center space-x-2 mb-1">
+                          <MdPlayArrow className="w-4 h-4 text-gray-400" />
+                          <span className="text-xs font-medium text-gray-400 uppercase tracking-wide">Videos</span>
+                        </div>
+                        <span className="text-sm font-medium text-white">{sections.reduce((total, section) => total + (section.videos?.length || 0), 0)}</span>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Course Content Management */}
-            <div className="bg-gray-900 rounded-xl p-8 border border-gray-700 shadow-xl">
-
-                {/* Course Sections */}
-                <div className="pt-2">
-                  <div className="flex justify-between items-center mb-6">
-                    <h3 className="text-2xl font-semibold text-white">Course Content</h3>
-                    <button
-                      type="button"
-                      onClick={() => setShowAddSection(!showAddSection)}
-                      className="px-6 py-3 bg-gray-800 hover:bg-gray-700 text-white rounded-lg text-sm font-medium transition-colors flex items-center space-x-2 border border-gray-600"
-                    >
-                      <MdAdd className="w-4 h-4" />
-                      <span>Add Section</span>
-                    </button>
+            {/* Course Content */}
+            <div className="bg-gray-900 rounded-xl border border-gray-700 shadow-sm">
+              <div className="border-b border-gray-700 p-6">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <h3 className="text-lg font-semibold text-white">Course Curriculum</h3>
+                    <p className="text-gray-400 text-sm mt-1">Organize your course into sections and lessons</p>
                   </div>
+                  <button
+                    type="button"
+                    onClick={() => setShowAddSection(!showAddSection)}
+                    className="inline-flex items-center space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors shadow-sm"
+                  >
+                    <MdAdd className="w-4 h-4" />
+                    <span>Add Section</span>
+                  </button>
+                </div>
+              </div>
 
-                  {/* Add Section Form */}
-                  {showAddSection && (
-                    <div className="mb-8 p-6 bg-gray-800/50 rounded-xl border border-gray-600/50 backdrop-blur-sm">
-                      <h4 className="text-white font-semibold text-lg mb-6">Create New Section</h4>
-                      <form onSubmit={handleAddSection} className="space-y-6">
-                        <div>
-                          <label htmlFor="sectionTitle" className="block text-sm font-semibold text-gray-200 mb-3">
-                            Section Title *
-                          </label>
-                          <input
-                            type="text"
-                            id="sectionTitle"
-                            name="title"
-                            value={newSection.title}
-                            onChange={handleNewSectionChange}
-                            className="w-full px-4 py-3 bg-gray-700 border border-gray-500/50 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
-                            placeholder="Enter section title"
-                            required
-                          />
-                        </div>
-                        <div>
-                          <label htmlFor="sectionResources" className="block text-sm font-semibold text-gray-200 mb-3">
-                            Resources (Optional)
-                          </label>
-                          <textarea
-                            id="sectionResources"
-                            name="resources"
-                            value={newSection.resources}
-                            onChange={handleNewSectionChange}
-                            rows={3}
-                            className="w-full px-4 py-3 bg-gray-700 border border-gray-500/50 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all resize-none"
-                            placeholder="Additional reading materials, exercises, etc."
-                          />
-                        </div>
-                        <div className="flex justify-end space-x-4">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setShowAddSection(false)
-                              setNewSection({ title: '', resources: '' })
-                            }}
-                            className="px-6 py-3 text-gray-400 hover:text-white transition-colors font-medium"
-                            disabled={loading}
-                          >
-                            Cancel
-                          </button>
-                          <button
-                            type="submit"
-                            disabled={loading}
-                            className="px-6 py-3 bg-gray-800 hover:bg-gray-700 disabled:bg-gray-600 text-white rounded-lg font-medium transition-colors"
-                          >
-                            {loading ? 'Adding...' : 'Add Section'}
-                          </button>
-                        </div>
-                      </form>
+              <div className="p-6">
+
+                {/* Add Section Form */}
+                {showAddSection && (
+                  <div className="mb-6 p-5 bg-blue-900/20 border border-blue-700/50 rounded-xl">
+                    <div className="flex items-center space-x-2 mb-4">
+                      <div className="w-8 h-8 bg-blue-900/50 rounded-lg flex items-center justify-center">
+                        <MdAdd className="w-4 h-4 text-blue-400" />
+                      </div>
+                      <h4 className="text-white font-medium">Create New Section</h4>
                     </div>
-                  )}
-
-                  {/* Existing Sections */}
-                  {sectionsLoading ? (
-                    <div className="text-center py-12">
-                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
-                      <p className="text-gray-400 text-lg">Loading sections...</p>
-                    </div>
-                  ) : sections.length > 0 ? (
-                    <div className="space-y-6">
-                      {sections.map((section, index) => (
-                        <div key={section.id} className="bg-gray-800/60 rounded-xl border border-gray-600/50 shadow-lg overflow-hidden">
-                          {/* Section Header */}
-                          <div className="p-6 border-b border-gray-600/50 bg-gradient-to-r from-gray-800/40 to-gray-700/40">
-                            <div className="flex justify-between items-start">
-                              <div className="flex-1">
-                                <div className="flex items-center space-x-4 mb-3">
-                                  <span className="flex items-center justify-center w-8 h-8 bg-gradient-to-r from-blue-600 to-blue-500 text-white text-sm font-bold rounded-xl shadow-md">
-                                    {index + 1}
-                                  </span>
-                                  <h4 className="text-white font-semibold text-lg">{section.title}</h4>
-                                </div>
-                                {section.resources && (
-                                  <p className="text-gray-300 text-sm ml-12 leading-relaxed">{section.resources}</p>
-                                )}
-                              </div>
-                              <div className="flex space-x-3">
-                                <button
-                                  onClick={() => {
-                                    setSelectedSectionId(section.id)
-                                    setShowAddVideo(true)
-                                    loadSectionVideos(section.id)
-                                  }}
-                                  className="text-gray-400 hover:text-white p-2 hover:bg-gray-700 rounded transition-colors"
-                                  disabled={loading}
-                                  title="Add video to section"
-                                >
-                                  <MdVideoLibrary className="w-4 h-4" />
-                                </button>
-                                <button
-                                  onClick={() => handleDeleteSection(section.id)}
-                                  className="text-gray-400 hover:text-red-400 p-2 hover:bg-gray-700 rounded transition-colors"
-                                  disabled={loading}
-                                  title="Delete section"
-                                >
-                                  <MdDelete className="w-4 h-4" />
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Section Videos */}
-                          <div className="p-6">
-                            <h5 className="text-white text-base font-semibold mb-4">Videos in this section</h5>
-                            {videosLoading ? (
-                              <div className="text-center py-8">
-                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto mb-3"></div>
-                                <p className="text-gray-400 text-sm">Loading videos...</p>
-                              </div>
-                            ) : sectionVideos[section.id]?.length > 0 ? (
-                              <div className="space-y-4">
-                                {sectionVideos[section.id].map((video, videoIndex) => (
-                                  <div key={video.id} className="bg-gray-700/60 rounded-xl border border-gray-600/40 overflow-hidden shadow-md">
-                                    {/* Video Header */}
-                                    <div className="flex items-center space-x-4 p-4">
-                                      <div className="flex items-center justify-center w-6 h-6 bg-gradient-to-r from-purple-500 to-purple-600 text-white text-xs font-bold rounded-lg shadow-sm">
-                                        {videoIndex + 1}
-                                      </div>
-                                      <div className="flex-1 min-w-0">
-                                        <h6 className="text-white text-sm font-semibold truncate">{video.title}</h6>
-                                        {video.description && (
-                                          <p className="text-gray-300 text-xs truncate mt-1">{video.description}</p>
-                                        )}
-                                        <div className="flex items-center space-x-4 mt-2">
-                                          <span className="text-gray-400 text-xs font-medium">Duration: {video.duration || '0:00'}</span>
-                                          {video.preview && (
-                                            <span className="text-green-400 text-xs font-medium bg-green-400/10 px-2 py-0.5 rounded-full">Preview</span>
-                                          )}
-                                        </div>
-                                      </div>
-                                      <div className="flex items-center space-x-2">
-                                        <button
-                                          onClick={() => toggleVideoPreview(video.id)}
-                                          className="text-gray-400 hover:text-white p-2 hover:bg-gray-700 rounded transition-colors"
-                                          title="Preview video"
-                                        >
-                                          <MdExpandMore className={`w-4 h-4 transform transition-transform ${expandedVideos[video.id] ? 'rotate-180' : ''}`} />
-                                        </button>
-                                        <button
-                                          onClick={() => window.open(video.videoUrl, '_blank')}
-                                          className="text-gray-400 hover:text-white p-2 hover:bg-gray-700 rounded transition-colors"
-                                          title="Open video in new tab"
-                                        >
-                                          <MdOpenInNew className="w-4 h-4" />
-                                        </button>
-                                        <button
-                                          onClick={() => handleDeleteVideo(video.id)}
-                                          className="text-gray-400 hover:text-red-400 p-2 hover:bg-gray-700 rounded transition-colors"
-                                          title="Delete video"
-                                        >
-                                          <MdDelete className="w-4 h-4" />
-                                        </button>
-                                      </div>
-                                    </div>
-
-                                    {/* Video Preview Dropdown */}
-                                    {expandedVideos[video.id] && (
-                                      <div className="border-t border-gray-600/50 p-6 bg-gray-800/50 backdrop-blur-sm">
-                                        <div className="space-y-6">
-                                          {/* Video Player */}
-                                          <div className="aspect-video bg-black rounded-xl overflow-hidden shadow-xl border border-gray-700/50">
-                                            <video
-                                              controls
-                                              preload="metadata"
-                                              className="w-full h-full object-contain"
-                                              poster="/video-placeholder.jpg"
-                                            >
-                                              <source src={video.videoUrl} type="video/mp4" />
-                                              <source src={video.videoUrl} type="video/webm" />
-                                              <source src={video.videoUrl} type="video/ogg" />
-                                              Your browser does not support the video tag.
-                                            </video>
-                                          </div>
-
-                                          {/* Video Details */}
-                                          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                                            <div className="bg-gray-800/60 p-3 rounded-lg border border-gray-600/40">
-                                              <div className="text-xs text-gray-400 mb-1">Position</div>
-                                              <div className="text-sm font-semibold text-white">{video.position || videoIndex + 1}</div>
-                                            </div>
-                                            <div className="bg-gray-800/60 p-3 rounded-lg border border-gray-600/40">
-                                              <div className="text-xs text-gray-400 mb-1">Duration</div>
-                                              <div className="text-sm font-semibold text-white">{video.duration || 'Unknown'}</div>
-                                            </div>
-                                            <div className="bg-gray-800/60 p-3 rounded-lg border border-gray-600/40">
-                                              <div className="text-xs text-gray-400 mb-1">Preview</div>
-                                              <div className={`text-sm font-semibold ${video.preview ? 'text-green-400' : 'text-gray-400'}`}>
-                                                {video.preview ? 'Yes' : 'No'}
-                                              </div>
-                                            </div>
-                                            <div className="bg-gray-800/60 p-3 rounded-lg border border-gray-600/40">
-                                              <div className="text-xs text-gray-400 mb-1">Course ID</div>
-                                              <div className="text-sm font-semibold text-white font-mono truncate">{video.course_id || 'N/A'}</div>
-                                            </div>
-                                          </div>
-
-                                          {/* Full Description */}
-                                          {video.description && (
-                                            <div className="bg-gray-800/60 p-4 rounded-lg border border-gray-600/40">
-                                              <div className="text-xs text-gray-400 mb-2">Description</div>
-                                              <p className="text-white text-sm leading-relaxed">{video.description}</p>
-                                            </div>
-                                          )}
-
-                                          {/* Video URL */}
-                                          <div className="bg-gray-800/60 p-4 rounded-lg border border-gray-600/40">
-                                            <div className="text-xs text-gray-400 mb-2">Video URL</div>
-                                            <p className="text-blue-400 text-xs break-all font-mono bg-gray-900/50 p-2 rounded border">{video.videoUrl}</p>
-                                          </div>
-                                        </div>
-                                      </div>
-                                    )}
-                                  </div>
-                                ))}
-                              </div>
-                            ) : (
-                              <div className="text-center py-8 text-gray-400 bg-gray-800/30 rounded-lg border border-gray-600/30">
-                                <MdVideoLibrary className="w-12 h-12 mx-auto mb-3 text-gray-500" />
-                                <p className="text-sm font-medium">No videos yet</p>
-                                <p className="text-xs mt-1">Click the video icon above to add videos to this section</p>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-center py-16 text-gray-400">
-                      <div className="bg-gray-800/30 rounded-2xl p-12 border border-gray-600/30">
-                        <MdFolder className="w-16 h-16 mx-auto mb-6 text-gray-500" />
-                        <h3 className="text-lg font-semibold text-white mb-2">No sections added yet</h3>
-                        <p className="text-sm text-gray-400 mb-6">Start building your course by adding sections and organizing your content</p>
+                    <form onSubmit={handleAddSection} className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-2">Section Title</label>
+                        <input
+                          type="text"
+                          name="title"
+                          value={newSection.title}
+                          onChange={handleNewSectionChange}
+                          className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                          placeholder="e.g., Introduction to JavaScript"
+                          required
+                        />
+                      </div>
+                      <div className="flex justify-end space-x-3 pt-2">
                         <button
-                          onClick={() => setShowAddSection(true)}
-                          className="px-6 py-3 bg-gray-800 hover:bg-gray-700 text-white rounded-lg font-medium transition-colors inline-flex items-center space-x-2 border border-gray-600"
+                          type="button"
+                          onClick={() => {
+                            setShowAddSection(false)
+                            setNewSection({ title: '' })
+                          }}
+                          className="px-4 py-2 text-gray-300 hover:text-white transition-colors font-medium"
+                          disabled={loading}
                         >
-                          <MdAdd className="w-4 h-4" />
-                          <span>Create First Section</span>
+                          Cancel
+                        </button>
+                        <button
+                          type="submit"
+                          disabled={loading}
+                          className="px-6 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-lg transition-colors font-medium inline-flex items-center space-x-2"
+                        >
+                          {loading ? (
+                            <>
+                              <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                              <span>Creating...</span>
+                            </>
+                          ) : (
+                            <span>Create Section</span>
+                          )}
                         </button>
                       </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Add Video Form */}
-                {showAddVideo && (
-                  <div className="border-t border-gray-600/50 pt-8 mt-8">
-                    <div className="mb-8 p-6 bg-gray-800/50 rounded-xl border border-gray-600/50 backdrop-blur-sm">
-                      <h4 className="text-white font-semibold text-lg mb-6">Add Video to Section</h4>
-                      <form onSubmit={handleAddVideo} className="space-y-6">
-                        <div>
-                          <label htmlFor="videoTitle" className="block text-sm font-semibold text-gray-200 mb-3">
-                            Video Title *
-                          </label>
-                          <input
-                            type="text"
-                            id="videoTitle"
-                            name="title"
-                            value={newVideo.title}
-                            onChange={handleNewVideoChange}
-                            className="w-full px-4 py-3 bg-gray-700 border border-gray-500/50 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
-                            placeholder="Enter video title"
-                            required
-                          />
-                        </div>
-                        
-                        <div>
-                          <label htmlFor="videoDescription" className="block text-sm font-semibold text-gray-200 mb-3">
-                            Video Description (Optional)
-                          </label>
-                          <textarea
-                            id="videoDescription"
-                            name="description"
-                            value={newVideo.description}
-                            onChange={handleNewVideoChange}
-                            rows={3}
-                            className="w-full px-4 py-3 bg-gray-700 border border-gray-500/50 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all resize-none"
-                            placeholder="Describe what this video covers"
-                          />
-                        </div>
-
-                        <div>
-                          <label htmlFor="videoFile" className="block text-sm font-semibold text-gray-200 mb-3">
-                            Video File *
-                          </label>
-                          
-                          {!newVideo.videoFile ? (
-                            <div className="border-2 border-dashed border-gray-600 rounded-lg p-8 text-center hover:border-gray-500 transition-colors bg-gray-800/50">
-                              <input
-                                type="file"
-                                id="videoFile"
-                                accept="video/*"
-                                onChange={handleVideoFileChange}
-                                className="hidden"
-                              />
-                              <label
-                                htmlFor="videoFile"
-                                className="cursor-pointer flex flex-col items-center space-y-3"
-                              >
-                                <div className="w-12 h-12 bg-gray-700 rounded-lg flex items-center justify-center">
-                                  <MdUploadFile className="w-6 h-6 text-gray-400" />
-                                </div>
-                                <div className="text-center">
-                                  <div className="text-white font-medium mb-1">
-                                    Select video file to upload
-                                  </div>
-                                  <div className="text-gray-400 text-sm">
-                                    MP4, MOV, AVI up to 100MB
-                                  </div>
-                                </div>
-                                <div className="text-xs text-gray-500">
-                                  or drag and drop
-                                </div>
-                              </label>
-                            </div>
-                          ) : (
-                            <div className="border border-gray-600 rounded-lg p-4 bg-gray-800/50">
-                              <div className="flex items-start justify-between">
-                                <div className="flex items-start space-x-3">
-                                  <div className="w-10 h-10 bg-gray-700 rounded flex items-center justify-center">
-                                    <MdVideoLibrary className="w-5 h-5 text-gray-400" />
-                                  </div>
-                                  <div className="flex-1 min-w-0">
-                                    <div className="text-white font-medium text-sm truncate">
-                                      {newVideo.videoFile.name}
-                                    </div>
-                                    <div className="text-gray-400 text-xs">
-                                      {uploadService.formatFileSize(newVideo.videoFile.size)}
-                                    </div>
-                                  </div>
-                                </div>
-                                <button
-                                  type="button"
-                                  onClick={() => setNewVideo(prev => ({ ...prev, videoFile: null }))}
-                                  className="text-gray-400 hover:text-white p-1"
-                                >
-                                  <MdClose className="w-4 h-4" />
-                                </button>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Upload Progress */}
-                        {loading && uploadProgress > 0 && (
-                          <div className="space-y-4 p-4 bg-blue-600/10 border border-blue-600/20 rounded-xl">
-                            <div className="flex justify-between text-sm">
-                              <span className="text-white font-semibold">Uploading video...</span>
-                              <span className="text-blue-400 font-bold">{uploadProgress}%</span>
-                            </div>
-                            <div className="w-full bg-gray-700 rounded-full h-3 shadow-inner">
-                              <div 
-                                className="bg-gradient-to-r from-blue-600 to-blue-500 h-3 rounded-full transition-all duration-500 shadow-lg"
-                                style={{ width: `${uploadProgress}%` }}
-                              ></div>
-                            </div>
-                          </div>
-                        )}
-
-                        <div className="flex justify-end space-x-4">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setShowAddVideo(false)
-                              setNewVideo({ title: '', description: '', videoFile: null })
-                              setSelectedSectionId('')
-                            }}
-                            className="px-6 py-3 text-gray-400 hover:text-white transition-colors font-medium"
-                            disabled={loading}
-                          >
-                            Cancel
-                          </button>
-                          <button
-                            type="submit"
-                            disabled={loading}
-                            className="px-6 py-3 bg-gray-800 hover:bg-gray-700 disabled:bg-gray-600 text-white rounded-lg font-medium transition-colors"
-                          >
-                            {loading ? 'Uploading...' : 'Add Video'}
-                          </button>
-                        </div>
-                      </form>
-                    </div>
+                    </form>
                   </div>
                 )}
 
-                {/* Action Buttons */}
-                <div className="flex justify-between items-center border-t border-gray-600/50 pt-8 mt-8">
-                  <button
-                    type="button"
-                    onClick={() => navigate('/courses')}
-                    className="px-6 py-3 bg-gray-800 hover:bg-gray-700 text-white rounded-lg font-medium transition-colors flex items-center space-x-2 border border-gray-600"
-                  >
-                    <MdArrowBack className="w-4 h-4" />
-                    <span>Back to Courses</span>
-                  </button>
-                  
-                  {formData.isPublished ? (
-                    <div className="flex items-center space-x-2 px-6 py-3 bg-green-600/20 border border-green-600/30 text-green-400 rounded-lg">
-                      <MdCheckCircle className="w-4 h-4" />
-                      <span className="font-medium">Course Published</span>
+                {/* Sections List */}
+                {sections.length > 0 ? (
+                  <div className="space-y-3">
+                    {sections.map((section, index) => (
+                      <div key={section.id} className="border border-gray-700 rounded-xl overflow-hidden bg-gray-800 shadow-sm hover:shadow-md transition-shadow">
+                        {/* Section Header */}
+                        <div className="p-5 bg-gray-800/50">
+                          <div className="flex justify-between items-center">
+                            <div className="flex items-center space-x-4">
+                              <div className="flex items-center justify-center w-8 h-8 bg-blue-900/50 text-blue-400 text-sm font-semibold rounded-lg">
+                                {index + 1}
+                              </div>
+                              <div>
+                                <h4 className="text-white font-medium text-base">{section.title}</h4>
+                                <span className="text-gray-400 text-sm">
+                                  {section.videos?.length || 0} lessons • {section.videos?.reduce((total, video) => {
+                                    const [minutes, seconds] = video.duration.split(':').map(Number);
+                                    return total + (minutes || 0) + (seconds ? seconds/60 : 0);
+                                  }, 0).toFixed(0) || 0} min
+                                </span>
+                              </div>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <button
+                                onClick={() => toggleSectionExpanded(section.id)}
+                                className="p-2 text-gray-400 hover:text-gray-300 hover:bg-gray-700 rounded-lg transition-colors"
+                                title="Toggle section"
+                              >
+                                {expandedSections[section.id] ? (
+                                  <MdExpandLess className="w-5 h-5" />
+                                ) : (
+                                  <MdExpandMore className="w-5 h-5" />
+                                )}
+                              </button>
+                              <button
+                                onClick={() => handleDeleteSection(section.id)}
+                                className="p-2 text-gray-400 hover:text-red-400 hover:bg-red-900/30 rounded-lg transition-colors"
+                                disabled={loading}
+                                title="Delete section"
+                              >
+                                <MdDelete className="w-5 h-5" />
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Section Content - Expandable */}
+                        {expandedSections[section.id] && (
+                          <div className="px-5 pb-5 space-y-6">
+                            {/* Videos List */}
+                            <div>
+                              <div className="flex justify-between items-center mb-4">
+                                <h5 className="text-white font-medium flex items-center space-x-2">
+                                  <div className="w-6 h-6 bg-emerald-900/50 rounded-lg flex items-center justify-center">
+                                    <MdPlayArrow className="w-4 h-4 text-emerald-400" />
+                                  </div>
+                                  <span>Video Lessons</span>
+                                </h5>
+                                <button
+                                  onClick={() => toggleAddVideo(section.id)}
+                                  className="inline-flex items-center space-x-2 px-3 py-2 text-emerald-300 bg-emerald-900/20 hover:bg-emerald-900/30 rounded-lg text-sm font-medium transition-colors border border-emerald-700/50"
+                                >
+                                  <MdAdd className="w-4 h-4" />
+                                  <span>Add Video</span>
+                                </button>
+                              </div>
+
+                              {/* Add Video Form */}
+                              {showAddVideo[section.id] && (
+                                <div className="mb-6 p-5 bg-emerald-900/20 border border-emerald-700/50 rounded-xl">
+                                  <div className="flex items-center space-x-2 mb-4">
+                                    <div className="w-8 h-8 bg-emerald-900/50 rounded-lg flex items-center justify-center">
+                                      <MdVideoLibrary className="w-4 h-4 text-emerald-400" />
+                                    </div>
+                                    <h6 className="text-white font-medium">Add New Video Lesson</h6>
+                                  </div>
+                                  <form onSubmit={(e) => handleAddVideo(e, section.id)} className="space-y-5">
+                                    <div>
+                                      <label className="block text-sm font-medium text-gray-300 mb-2">Video Title *</label>
+                                      <input
+                                        type="text"
+                                        name="title"
+                                        value={newVideo.title}
+                                        onChange={handleNewVideoChange}
+                                        className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
+                                        placeholder="e.g., Introduction to Variables"
+                                        required
+                                      />
+                                    </div>
+                                    
+                                    <div>
+                                      <label className="block text-sm font-medium text-gray-300 mb-2">Description</label>
+                                      <textarea
+                                        name="description"
+                                        value={newVideo.description}
+                                        onChange={handleNewVideoChange}
+                                        rows={3}
+                                        className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 resize-none transition-colors"
+                                        placeholder="Brief description of what students will learn (optional)"
+                                      />
+                                    </div>
+
+                                    <div>
+                                      <label className="block text-sm font-medium text-gray-300 mb-2">Video File *</label>
+                                      <div className="relative">
+                                        <input
+                                          type="file"
+                                          name="videoFile"
+                                          onChange={handleNewVideoChange}
+                                          accept="video/*"
+                                          className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:bg-emerald-900/30 file:text-emerald-300 hover:file:bg-emerald-900/50 file:font-medium transition-colors"
+                                          required
+                                        />
+                                        {newVideo.videoFile && (
+                                          <div className="mt-2 p-3 bg-green-900/30 border border-green-700/50 rounded-lg">
+                                            <p className="text-green-300 text-sm font-medium">
+                                              ✓ {newVideo.videoFile.name}
+                                            </p>
+                                            <p className="text-green-400 text-xs mt-1">
+                                              Size: {uploadService.formatFileSize(newVideo.videoFile.size)}
+                                            </p>
+                                          </div>
+                                        )}
+                                      </div>
+                                    </div>
+
+                                    <div className="flex items-start space-x-3">
+                                      <input
+                                        type="checkbox"
+                                        name="preview"
+                                        id={`preview-${section.id}`}
+                                        checked={newVideo.preview}
+                                        onChange={handleNewVideoChange}
+                                        className="mt-1 rounded bg-gray-700 border-gray-600 text-emerald-500 focus:ring-emerald-500"
+                                      />
+                                      <div>
+                                        <label htmlFor={`preview-${section.id}`} className="text-sm font-medium text-gray-300">
+                                          Preview Lesson
+                                        </label>
+                                        <p className="text-xs text-gray-400 mt-1">Allow students to watch this lesson for free</p>
+                                      </div>
+                                    </div>
+
+                                    {/* Upload Progress */}
+                                    {uploadingVideo && (
+                                      <div className="p-4 bg-blue-900/30 border border-blue-700/50 rounded-lg">
+                                        <div className="flex justify-between text-sm mb-2">
+                                          <span className="text-blue-300 font-medium">Uploading video...</span>
+                                          <span className="text-blue-400 font-semibold">{uploadProgress}%</span>
+                                        </div>
+                                        <div className="w-full bg-blue-900/50 rounded-full h-2">
+                                          <div 
+                                            className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+                                            style={{ width: `${uploadProgress}%` }}
+                                          ></div>
+                                        </div>
+                                      </div>
+                                    )}
+
+                                    <div className="flex justify-end space-x-3 pt-2">
+                                      <button
+                                        type="button"
+                                        onClick={() => toggleAddVideo(section.id)}
+                                        className="px-4 py-2 text-gray-300 hover:text-white transition-colors font-medium"
+                                        disabled={uploadingVideo}
+                                      >
+                                        Cancel
+                                      </button>
+                                      <button
+                                        type="submit"
+                                        disabled={uploadingVideo}
+                                        className="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-400 text-white rounded-lg transition-colors font-medium inline-flex items-center space-x-2 shadow-sm"
+                                      >
+                                        {uploadingVideo ? (
+                                          <>
+                                            <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                                            <span>Uploading...</span>
+                                          </>
+                                        ) : (
+                                          <>
+                                            <MdCloudUpload className="w-4 h-4" />
+                                            <span>Upload Video</span>
+                                          </>
+                                        )}
+                                      </button>
+                                    </div>
+                                  </form>
+                                </div>
+                              )}
+
+                              {/* Video List */}
+                              {section.videos && section.videos.length > 0 ? (
+                                <div className="space-y-3">
+                                  {section.videos.map((video, videoIndex) => (
+                                    <div key={video.id} className="p-4 bg-gray-700/50 rounded-lg border border-gray-600/50 hover:border-gray-500/50 transition-colors">
+                                      <div className="flex items-start justify-between">
+                                        <div className="flex-1">
+                                          <div className="flex items-center space-x-3 mb-2">
+                                            <button 
+                                              onClick={() => handlePlayVideo(video)}
+                                              className="w-8 h-8 bg-blue-600/20 hover:bg-blue-600/40 rounded-lg flex items-center justify-center transition-colors group"
+                                            >
+                                              <MdPlayArrow className="w-4 h-4 text-blue-400 group-hover:text-blue-300" />
+                                            </button>
+                                            <div>
+                                              <h6 className="text-white font-medium text-sm">{video.title}</h6>
+                                              <div className="flex items-center space-x-3 text-xs text-gray-400 mt-1">
+                                                <span>Position: {video.position}</span>
+                                                <span>Duration: {video.duration}</span>
+                                                {video.preview && (
+                                                  <span className="px-2 py-0.5 bg-green-600/20 text-green-400 rounded-full">Preview</span>
+                                                )}
+                                              </div>
+                                            </div>
+                                          </div>
+                                          {video.description && (
+                                            <p className="text-gray-300 text-xs ml-11">{video.description}</p>
+                                          )}
+                                        </div>
+                                        <div className="flex items-center space-x-2 ml-4">
+                                          <button className="p-1.5 text-gray-400 hover:text-white hover:bg-gray-600/50 rounded-lg transition-colors">
+                                            <MdEdit className="w-3.5 h-3.5" />
+                                          </button>
+                                          <button className="p-1.5 text-gray-400 hover:text-red-400 hover:bg-red-600/10 rounded-lg transition-colors">
+                                            <MdDelete className="w-3.5 h-3.5" />
+                                          </button>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              ) : (
+                                <div className="text-center py-8 px-4">
+                                  <div className="w-12 h-12 bg-gray-700 rounded-xl flex items-center justify-center mx-auto mb-3">
+                                    <MdVideoLibrary className="w-6 h-6 text-gray-400" />
+                                  </div>
+                                  <p className="text-gray-300 text-sm font-medium mb-1">No video lessons yet</p>
+                                  <p className="text-gray-500 text-xs">Click "Add Video" to upload your first lesson</p>
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Materials Section */}
+                            <div>
+                              <div className="flex justify-between items-center mb-4">
+                                <h5 className="text-white font-medium flex items-center space-x-2">
+                                  <div className="w-6 h-6 bg-amber-900/50 rounded-lg flex items-center justify-center">
+                                    <MdDescription className="w-4 h-4 text-amber-400" />
+                                  </div>
+                                  <span>Learning Materials</span>
+                                </h5>
+                                <button className="inline-flex items-center space-x-2 px-3 py-2 text-amber-300 bg-amber-900/20 hover:bg-amber-900/30 rounded-lg text-sm font-medium transition-colors border border-amber-700/50">
+                                  <MdAdd className="w-4 h-4" />
+                                  <span>Add Material</span>
+                                </button>
+                              </div>
+                              
+                              <div className="text-center py-8 px-4">
+                                <div className="w-12 h-12 bg-gray-700 rounded-xl flex items-center justify-center mx-auto mb-3">
+                                  <MdDescription className="w-6 h-6 text-gray-400" />
+                                </div>
+                                <p className="text-gray-300 text-sm font-medium mb-1">No learning materials yet</p>
+                                <p className="text-gray-500 text-xs">Add PDFs, documents, or other resources for students</p>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                  </div>
+                ))}
+              </div>
+                ) : (
+                  <div className="text-center py-12">
+                    <div className="w-16 h-16 bg-gray-800 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                      <MdVideoLibrary className="w-8 h-8 text-gray-400" />
                     </div>
-                  ) : (
+                    <h4 className="text-white font-medium mb-2">No sections yet</h4>
+                    <p className="text-gray-400 text-sm mb-6 max-w-sm mx-auto">
+                      Get started by creating your first section to organize your course content
+                    </p>
                     <button
-                      type="button"
-                      onClick={handlePublishCourse}
-                      disabled={loading}
-                      className="px-6 py-3 bg-gray-800 hover:bg-gray-700 disabled:bg-gray-600 text-white rounded-lg font-medium transition-colors flex items-center space-x-2 border border-gray-600"
+                      onClick={() => setShowAddSection(true)}
+                      className="inline-flex items-center space-x-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors shadow-sm"
                     >
-                      {loading ? (
-                        <>
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                          <span>Publishing...</span>
-                        </>
-                      ) : (
-                        <>
-                          <MdCheckCircle className="w-4 h-4" />
-                          <span>Publish Now</span>
-                        </>
-                      )}
+                      <MdAdd className="w-4 h-4" />
+                      <span>Create First Section</span>
                     </button>
-                  )}
-                </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </main>
       </div>
+
+      {/* Video Player Modal */}
+      {showVideoPlayer && currentVideo && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm">
+          <div className="relative w-full max-w-4xl mx-4">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between mb-4 px-2">
+              <div>
+                <h3 className="text-white font-semibold text-lg">{currentVideo.title}</h3>
+                {currentVideo.description && (
+                  <p className="text-gray-300 text-sm mt-1">{currentVideo.description}</p>
+                )}
+              </div>
+              <button
+                onClick={handleCloseVideoPlayer}
+                className="p-2 text-gray-400 hover:text-white hover:bg-gray-700/50 rounded-lg transition-colors"
+              >
+                <MdClose className="w-6 h-6" />
+              </button>
+            </div>
+
+            {/* Video Player */}
+            <div className="relative bg-black rounded-lg overflow-hidden shadow-2xl">
+              <video
+                className="w-full h-auto max-h-[70vh]"
+                controls
+                autoPlay
+                preload="metadata"
+                controlsList="nodownload"
+              >
+                <source src={currentVideo.videoUrl} type="video/mp4" />
+                <source src={currentVideo.videoUrl} type="video/webm" />
+                <source src={currentVideo.videoUrl} type="video/quicktime" />
+                Your browser does not support the video tag.
+              </video>
+            </div>
+
+            {/* Video Info */}
+            <div className="mt-4 p-4 bg-gray-800/50 rounded-lg">
+              <div className="flex items-center justify-between text-sm">
+                <div className="flex items-center space-x-4 text-gray-300">
+                  <span>Duration: {currentVideo.duration}</span>
+                  <span>Position: {currentVideo.position}</span>
+                  {currentVideo.preview && (
+                    <span className="px-2 py-1 bg-green-600/20 text-green-400 rounded-full text-xs">Preview Available</span>
+                  )}
+                </div>
+                <div className="text-gray-400 text-xs">
+                  Created: {new Date(currentVideo.created_at).toLocaleDateString()}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

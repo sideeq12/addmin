@@ -45,7 +45,7 @@ function Sidebar() {
       )}
 
       {/* Sidebar */}
-      <aside className={`fixed w-56 bg-black border border-gray-800 min-h-screen p-4 border-r border-gray-800 shadow-xl z-50 transition-transform duration-300 ${
+      <aside className={`fixed w-56 bg-black border  min-h-screen p-4 border-r border-gray-800 shadow-xl z-50 transition-transform duration-300 ${
         isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
       }`}>
       <div className="mb-8">

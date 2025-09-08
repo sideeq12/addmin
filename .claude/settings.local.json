@@ -3,7 +3,13 @@
     "allow": [
       "WebFetch(domain:tryscholarbase.com)",
       "Bash(npm install:*)",
-      "Bash(npx:*)"
+      "Bash(npx:*)",
+      "Bash(find:*)",
+      "Bash(for:*)",
+      "Bash(do sed -i 's/lg:ml-56/lg:ml-48/g' \"$file\")",
+      "Bash(done)",
+      "Bash(do sed -i 's/lg:ml-48/lg:ml-56/g' \"$file\")",
+      "Bash(tree:*)"
     ],
     "deny": [],
     "ask": []

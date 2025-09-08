@@ -81,7 +81,7 @@ function Dashboard() {
         <Sidebar />
 
         {/* Main Content */}
-        <main className="flex-1 lg:ml-56 p-4 lg:p-6">
+        <main className="flex-1 lg:ml-56 pl-8 p-4 lg:p-6">
           {/* Header */}
           <div className="mb-6">
             <h1 className="text-2xl font-bold text-white mb-2">
