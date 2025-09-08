@@ -66,6 +66,18 @@ export const courseService = {
     }
   },
 
+  async publishCourse(courseId) {
+    try {
+      console.log('📢 Publishing course with PUT request to:', `/api/courses/${courseId}`);
+      const response = await apiClient.put(`/api/courses/${courseId}`);
+      console.log('📤 Publish course response:', response);
+      return response;
+    } catch (error) {
+      console.error('Publish course error:', error);
+      throw error;
+    }
+  },
+
   async deleteCourse(courseId) {
     try {
       const response = await apiClient.delete(`/api/courses/${courseId}`);
@@ -153,6 +165,18 @@ export const courseService = {
       return response;
     } catch (error) {
       console.error('Get section videos error:', error);
+      throw error;
+    }
+  },
+
+  async deleteVideo(videoId) {
+    try {
+      console.log('🗑️ Deleting video with ID:', videoId);
+      const response = await apiClient.delete(`/api/videos/${videoId}`);
+      console.log('✅ Video deleted successfully:', response);
+      return response;
+    } catch (error) {
+      console.error('Delete video error:', error);
       throw error;
     }
   },

@@ -335,6 +335,59 @@ function EditCourse() {
     }
   }, [showVideoPlayer])
 
+  const handlePublishCourse = async () => {
+    if (!courseId) return
+
+    try {
+      setLoading(true)
+      setError('')
+
+      console.log('📢 Publishing course:', courseId)
+      
+      const response = await courseService.publishCourse(courseId)
+      
+      console.log('✅ Course published successfully:', response)
+      
+      // Update local state to reflect published status
+      setFormData(prev => ({
+        ...prev,
+        isPublished: true
+      }))
+
+    } catch (err) {
+      console.error('Publish course error:', err)
+      setError(err.message || 'Failed to publish course')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleDeleteVideo = async (videoId, videoTitle) => {
+    if (!confirm(`Are you sure you want to delete "${videoTitle}"? This action cannot be undone.`)) {
+      return
+    }
+
+    try {
+      setLoading(true)
+      setError('')
+
+      console.log('🗑️ Deleting video:', videoId)
+      
+      const response = await courseService.deleteVideo(videoId)
+      
+      console.log('✅ Video deleted successfully:', response)
+      
+      // Reload sections to reflect the deletion
+      await loadSections()
+
+    } catch (err) {
+      console.error('Delete video error:', err)
+      setError(err.message || 'Failed to delete video')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   if (pageLoading) {
     return (
       <div className="min-h-screen bg-black">
@@ -386,9 +439,17 @@ function EditCourse() {
                     <span className="text-amber-300 text-sm font-medium">Draft</span>
                   </div>
                 )}
-                <button className="flex items-center space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors text-sm font-medium">
-                  <MdSave className="w-4 h-4" />
-                  <span>Save Changes</span>
+                <button 
+                  onClick={handlePublishCourse}
+                  disabled={loading || formData.isPublished}
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors text-sm font-medium ${
+                    formData.isPublished 
+                      ? 'bg-green-600 text-white cursor-not-allowed' 
+                      : 'bg-blue-600 hover:bg-blue-700 text-white'
+                  } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                >
+                  <MdPublish className="w-4 h-4" />
+                  <span>{formData.isPublished ? 'Published' : 'Publish Now'}</span>
                 </button>
                 <button className="p-2 text-gray-400 hover:text-gray-300 hover:bg-gray-800 rounded-lg transition-colors">
                   <MdMoreVert className="w-5 h-5" />
@@ -780,7 +841,11 @@ function EditCourse() {
                                           <button className="p-1.5 text-gray-400 hover:text-white hover:bg-gray-600/50 rounded-lg transition-colors">
                                             <MdEdit className="w-3.5 h-3.5" />
                                           </button>
-                                          <button className="p-1.5 text-gray-400 hover:text-red-400 hover:bg-red-600/10 rounded-lg transition-colors">
+                                          <button 
+                                            onClick={() => handleDeleteVideo(video.id, video.title)}
+                                            disabled={loading}
+                                            className="p-1.5 text-gray-400 hover:text-red-400 hover:bg-red-600/10 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                          >
                                             <MdDelete className="w-3.5 h-3.5" />
                                           </button>
                                         </div>
