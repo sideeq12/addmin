@@ -165,20 +165,24 @@ function EditCourse() {
     }
   }
 
-  const handleDeleteSection = async (sectionId) => {
-    if (!confirm('Are you sure you want to delete this section?')) return
+  const handleDeleteSection = async (sectionId, sectionTitle) => {
+    if (!confirm(`Are you sure you want to delete "${sectionTitle}"? This will also delete all videos in this section. This action cannot be undone.`)) {
+      return
+    }
 
     try {
       setLoading(true)
       setError('')
 
+      console.log('🗑️ Deleting section:', sectionId)
+      
       const response = await courseService.deleteSection(sectionId)
       
-      if (response.success) {
-        await loadSections()
-      } else {
-        throw new Error(response.error || 'Failed to delete section')
-      }
+      console.log('✅ Section deleted successfully:', response)
+      
+      // Always reload sections after deletion attempt
+      await loadSections()
+
     } catch (err) {
       console.error('Delete section error:', err)
       setError(err.message || 'Failed to delete section')
@@ -653,7 +657,7 @@ function EditCourse() {
                                 )}
                               </button>
                               <button
-                                onClick={() => handleDeleteSection(section.id)}
+                                onClick={() => handleDeleteSection(section.id, section.title)}
                                 className="p-2 text-gray-400 hover:text-red-400 hover:bg-red-900/30 rounded-lg transition-colors"
                                 disabled={loading}
                                 title="Delete section"

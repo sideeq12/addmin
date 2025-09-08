@@ -203,7 +203,9 @@ export const courseService = {
 
   async deleteSection(sectionId) {
     try {
+      console.log('🗑️ Deleting section with ID:', sectionId);
       const response = await apiClient.delete(`/api/sections/${sectionId}`);
+      console.log('✅ Section deleted successfully:', response);
       return response;
     } catch (error) {
       console.error('Delete section error:', error);
