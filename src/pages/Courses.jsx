@@ -47,6 +47,7 @@ function Courses() {
       // Transform API data to match UI expectations
       const transformedCourses = coursesData.map(course => {
         console.log(`🔍 Course "${course.title}" - is_published:`, course.is_published, typeof course.is_published)
+        console.log(`🖼️ Course "${course.title}" - thumbnail:`, course.thumbnail)
         
         return {
           id: course.id,
@@ -57,7 +58,7 @@ function Courses() {
           status: course.is_published === true || course.is_published === 'true' ? 'active' : 'draft',
           earnings: '₦0', // Mock data - earnings endpoint not yet available
           price: course.price,
-          image: course.thumbnail_url || '/class.avif',
+          image: course.thumbnail || '/class.avif',
           description: course.description,
           level: course.level,
           created_at: course.created_at
@@ -181,6 +182,10 @@ function Courses() {
                     src={course.image} 
                     alt={course.title}
                     className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.target.src = '/class.avif'
+                    }}
+                    loading="lazy"
                   />
                   <div className="absolute top-4 right-4">
                     <span className={`px-3 py-1 rounded-full text-xs font-semibold ${

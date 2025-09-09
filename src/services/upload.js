@@ -172,6 +172,88 @@ export const uploadService = {
     }
   },
 
+  // Document Upload for Section Resources
+  async uploadDocument(documentFile, onProgress = null) {
+    try {
+      console.log('📄 Uploading document to /api/uploads/document');
+      
+      const formData = new FormData();
+      formData.append('file', documentFile);
+
+      // Create XMLHttpRequest for progress tracking
+      return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+
+        // Track upload progress
+        if (onProgress) {
+          xhr.upload.addEventListener('progress', (event) => {
+            if (event.lengthComputable) {
+              const percentComplete = (event.loaded / event.total) * 100;
+              onProgress(Math.round(percentComplete));
+            }
+          });
+        }
+
+        xhr.addEventListener('load', () => {
+          console.log('Document upload response status:', xhr.status);
+          console.log('Document upload response text:', xhr.responseText);
+          
+          if (xhr.status === 200) {
+            try {
+              const response = JSON.parse(xhr.responseText);
+              console.log('📄 Document uploaded successfully:', response);
+              resolve(response);
+            } catch (error) {
+              reject(new Error('Invalid response format'));
+            }
+          } else {
+            try {
+              const errorResponse = JSON.parse(xhr.responseText);
+              console.error('📄 Document upload error response:', errorResponse);
+              reject(new Error(errorResponse.error || errorResponse.message || `Document upload failed with status ${xhr.status}`));
+            } catch (parseError) {
+              console.error('📄 Document upload failed - Response not JSON:', xhr.responseText);
+              reject(new Error(`Document upload failed with status ${xhr.status}: ${xhr.responseText || 'No response text'}`));
+            }
+          }
+        });
+
+        xhr.addEventListener('error', () => {
+          reject(new Error('Network error during document upload'));
+        });
+
+        xhr.addEventListener('timeout', () => {
+          reject(new Error('Document upload timeout'));
+        });
+
+        // Set timeout to 5 minutes for documents
+        xhr.timeout = 300000;
+
+        xhr.open('POST', `${apiClient.baseURL}/api/uploads/document`);
+        
+        // Add authorization header
+        const token = localStorage.getItem('access_token');
+        if (token) {
+          xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+        }
+
+        xhr.send(formData);
+        console.log('📤 Document upload request sent to /api/uploads/document');
+        console.log('📤 Request details:', {
+          method: 'POST',
+          url: `${apiClient.baseURL}/api/uploads/document`,
+          fileSize: documentFile.size,
+          fileName: documentFile.name,
+          fileType: documentFile.type,
+          hasAuthToken: !!token
+        });
+      });
+    } catch (error) {
+      console.error('Document upload error:', error);
+      throw error;
+    }
+  },
+
   // Utility functions
   validateVideoFile(file) {
     const maxSize = 100 * 1024 * 1024; // 100MB
@@ -218,6 +300,33 @@ export const uploadService = {
 
     if (!allowedTypes.includes(file.type)) {
       throw new Error('Invalid image format. Supported formats: JPEG, JPG, PNG, GIF, WebP');
+    }
+
+    return true;
+  },
+
+  validateDocumentFile(file) {
+    const maxSize = 50 * 1024 * 1024; // 50MB
+    const allowedTypes = [
+      'application/pdf',
+      'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/vnd.ms-powerpoint',
+      'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+      'text/plain',
+      'application/rtf'
+    ];
+
+    if (!file) {
+      throw new Error('No file selected');
+    }
+
+    if (file.size > maxSize) {
+      throw new Error('Document file must be less than 50MB');
+    }
+
+    if (!allowedTypes.includes(file.type)) {
+      throw new Error('Invalid document format. Supported formats: PDF, DOC, DOCX, PPT, PPTX, TXT, RTF');
     }
 
     return true;

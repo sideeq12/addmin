@@ -64,6 +64,9 @@ function EditCourse() {
   const [uploadingVideo, setUploadingVideo] = useState(false)
   const [showVideoPlayer, setShowVideoPlayer] = useState(false)
   const [currentVideo, setCurrentVideo] = useState(null)
+  const [showAddDocument, setShowAddDocument] = useState({})
+  const [uploadingDocument, setUploadingDocument] = useState(false)
+  const [documentUploadProgress, setDocumentUploadProgress] = useState(0)
 
   // Load course data
   useEffect(() => {
@@ -389,6 +392,91 @@ function EditCourse() {
       setError(err.message || 'Failed to delete video')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleDocumentUpload = async (e, sectionId) => {
+    const file = e.target.files[0]
+    if (!file) return
+
+    try {
+      setUploadingDocument(true)
+      setDocumentUploadProgress(0)
+      setError('')
+
+      console.log('🎯 Document upload started for section:', sectionId)
+      console.log('🎯 Current sections state length:', sections.length)
+
+      // Validate document file
+      uploadService.validateDocumentFile(file)
+
+      console.log('📄 Starting document upload process...')
+      console.log('Document file:', file.name, file.size)
+
+      // Step 1: Upload document file to get URL
+      const uploadResponse = await uploadService.uploadDocument(
+        file,
+        (progress) => setDocumentUploadProgress(progress)
+      )
+
+      console.log('📤 Document upload response:', uploadResponse)
+
+      if (!uploadResponse.success || !uploadResponse.url) {
+        throw new Error('Document upload failed - no URL returned')
+      }
+
+      // Step 2: Update section resources with the uploaded URL
+      console.log('🔍 Looking for section with ID:', sectionId)
+      console.log('🔍 Available sections:', sections.map(s => ({id: s.id, title: s.title})))
+      
+      const currentSection = sections.find(s => s.id === sectionId)
+      
+      if (!currentSection) {
+        console.error('❌ Section not found locally!', {
+          searchId: sectionId,
+          availableSections: sections.map(s => s.id)
+        })
+        throw new Error(`Section with ID ${sectionId} not found`)
+      }
+      
+      console.log('📋 Current section data:', currentSection)
+      
+      const updateData = {
+        title: currentSection.title || '',
+        position: currentSection.position || 1,
+        resources: uploadResponse.url
+      }
+
+      console.log('📝 Updating section resources with data:', updateData)
+      console.log('🌐 Making API call to update section ID:', sectionId)
+      console.log('🌐 API endpoint will be: /api/sections/' + sectionId)
+      
+      const response = await courseService.updateSection(sectionId, updateData)
+      
+      console.log('✅ Section resources updated successfully:', response)
+      
+      // Check if update was actually successful
+      if (!response || (response.success === false)) {
+        throw new Error(response?.error || response?.message || 'Section update failed - no success confirmation')
+      }
+      
+      // Reload sections to show new resource
+      await loadSections()
+      
+      // Hide the add document form
+      setShowAddDocument(prev => ({
+        ...prev,
+        [sectionId]: false
+      }))
+
+    } catch (err) {
+      console.error('Document upload error:', err)
+      setError(err.message || 'Failed to upload document')
+    } finally {
+      setUploadingDocument(false)
+      setDocumentUploadProgress(0)
+      // Reset file input
+      e.target.value = ''
     }
   }
 
@@ -877,19 +965,113 @@ function EditCourse() {
                                   </div>
                                   <span>Learning Materials</span>
                                 </h5>
-                                <button className="inline-flex items-center space-x-2 px-3 py-2 text-amber-300 bg-amber-900/20 hover:bg-amber-900/30 rounded-lg text-sm font-medium transition-colors border border-amber-700/50">
+                                <button 
+                                  onClick={() => setShowAddDocument(prev => ({
+                                    ...prev,
+                                    [section.id]: !prev[section.id]
+                                  }))}
+                                  className="inline-flex items-center space-x-2 px-3 py-2 text-amber-300 bg-amber-900/20 hover:bg-amber-900/30 rounded-lg text-sm font-medium transition-colors border border-amber-700/50"
+                                >
                                   <MdAdd className="w-4 h-4" />
                                   <span>Add Material</span>
                                 </button>
                               </div>
-                              
-                              <div className="text-center py-8 px-4">
-                                <div className="w-12 h-12 bg-gray-700 rounded-xl flex items-center justify-center mx-auto mb-3">
-                                  <MdDescription className="w-6 h-6 text-gray-400" />
+
+                              {/* Add Document Form */}
+                              {showAddDocument[section.id] && (
+                                <div className="mb-6 p-5 bg-amber-900/20 border border-amber-700/50 rounded-xl">
+                                  <div className="flex items-center space-x-2 mb-4">
+                                    <div className="w-8 h-8 bg-amber-900/50 rounded-lg flex items-center justify-center">
+                                      <MdDescription className="w-4 h-4 text-amber-400" />
+                                    </div>
+                                    <h6 className="text-white font-medium">Add Learning Material</h6>
+                                  </div>
+                                  
+                                  <div className="space-y-4">
+                                    <div>
+                                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                                        Select Document *
+                                      </label>
+                                      <input
+                                        type="file"
+                                        accept=".pdf,.doc,.docx,.ppt,.pptx,.txt,.rtf"
+                                        onChange={(e) => handleDocumentUpload(e, section.id)}
+                                        disabled={uploadingDocument}
+                                        className="block w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-amber-600/20 file:text-amber-300 hover:file:bg-amber-600/30 file:transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                      />
+                                      <p className="text-xs text-gray-400 mt-1">
+                                        Supported formats: PDF, DOC, DOCX, PPT, PPTX, TXT, RTF (Max: 50MB)
+                                      </p>
+                                    </div>
+
+                                    {uploadingDocument && (
+                                      <div className="space-y-2">
+                                        <div className="flex justify-between text-sm">
+                                          <span className="text-gray-300">Uploading document...</span>
+                                          <span className="text-amber-400">{documentUploadProgress}%</span>
+                                        </div>
+                                        <div className="w-full bg-gray-700 rounded-full h-2">
+                                          <div 
+                                            className="bg-amber-500 h-2 rounded-full transition-all duration-300"
+                                            style={{ width: `${documentUploadProgress}%` }}
+                                          ></div>
+                                        </div>
+                                      </div>
+                                    )}
+
+                                    <div className="flex justify-end space-x-3">
+                                      <button
+                                        type="button"
+                                        onClick={() => setShowAddDocument(prev => ({
+                                          ...prev,
+                                          [section.id]: false
+                                        }))}
+                                        disabled={uploadingDocument}
+                                        className="px-4 py-2 text-gray-300 hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                      >
+                                        Cancel
+                                      </button>
+                                    </div>
+                                  </div>
                                 </div>
-                                <p className="text-gray-300 text-sm font-medium mb-1">No learning materials yet</p>
-                                <p className="text-gray-500 text-xs">Add PDFs, documents, or other resources for students</p>
-                              </div>
+                              )}
+                              
+                              {/* Materials List */}
+                              {section.resources ? (
+                                <div className="p-4 bg-amber-900/10 rounded-lg border border-amber-700/30">
+                                  <div className="flex items-center space-x-3">
+                                    <div className="w-10 h-10 bg-amber-600/20 rounded-lg flex items-center justify-center">
+                                      <MdDescription className="w-5 h-5 text-amber-400" />
+                                    </div>
+                                    <div className="flex-1">
+                                      <h6 className="text-white font-medium text-sm">Learning Resource</h6>
+                                      <p className="text-gray-300 text-xs">Click to download or view</p>
+                                    </div>
+                                    <div className="flex items-center space-x-2">
+                                      <a
+                                        href={section.resources}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="p-2 text-amber-400 hover:text-amber-300 hover:bg-amber-600/10 rounded-lg transition-colors"
+                                        title="Open resource"
+                                      >
+                                        <MdVisibility className="w-4 h-4" />
+                                      </a>
+                                      <button className="p-2 text-gray-400 hover:text-red-400 hover:bg-red-600/10 rounded-lg transition-colors">
+                                        <MdDelete className="w-4 h-4" />
+                                      </button>
+                                    </div>
+                                  </div>
+                                </div>
+                              ) : (
+                                <div className="text-center py-8 px-4">
+                                  <div className="w-12 h-12 bg-gray-700 rounded-xl flex items-center justify-center mx-auto mb-3">
+                                    <MdDescription className="w-6 h-6 text-gray-400" />
+                                  </div>
+                                  <p className="text-gray-300 text-sm font-medium mb-1">No learning materials yet</p>
+                                  <p className="text-gray-500 text-xs">Add PDFs, documents, or other resources for students</p>
+                                </div>
+                              )}
                             </div>
                           </div>
                         )}

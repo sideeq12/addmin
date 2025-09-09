@@ -23,6 +23,7 @@ function CreateCourse() {
     description: '',
     category: '',
     level: 'ss1',
+    price: '',
     thumbnail: null
   })
 
@@ -133,22 +134,32 @@ function CreateCourse() {
       }
 
       // Create course data
+      const coursePrice = formData.price ? parseFloat(formData.price) : 0
+      
       const courseData = {
         title: formData.title.trim(),
         description: formData.description.trim(),
-        price: 0,
+        price: coursePrice,
         level: formData.level.charAt(0).toUpperCase() + formData.level.slice(1),
         category: formData.category,
         thumbnail: thumbnailUrl,
-        requirements: null,
+        requirements: "Basic computer knowledge",
         issue_certificate: false,
-        downloadable_material: null,
-        objectives: null,
+        downloadable_material: "Course materials and resources will be provided",
+        objectives: `Learn ${formData.title.trim()} with comprehensive coverage of all topics`,
         instructor: `${user.first_name} ${user.last_name}`,
-        original_price: 0,
-        duration_hours: 0,
-        tags: []
+        original_price: coursePrice,
+        duration_hours: 10,
+        tags: [
+          formData.category.toLowerCase().replace(/\s+/g, '-'),
+          formData.level.toLowerCase(),
+          "education"
+        ]
       }
+
+      console.log('🎓 Course data being sent to API:', JSON.stringify(courseData, null, 2))
+      console.log('🎓 User data:', JSON.stringify(user, null, 2))
+      console.log('🎓 Form data:', JSON.stringify(formData, null, 2))
 
       // Submit course creation
       const response = await courseService.createCourse(courseData)
@@ -285,6 +296,27 @@ function CreateCourse() {
                       ))}
                     </select>
                   </div>
+                </div>
+
+                {/* Course Price */}
+                <div className="space-y-2">
+                  <label htmlFor="price" className="block text-sm font-medium text-white">
+                    Course Price (₦)
+                  </label>
+                  <input
+                    type="number"
+                    id="price"
+                    name="price"
+                    value={formData.price}
+                    onChange={handleInputChange}
+                    min="0"
+                    step="0.01"
+                    className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600/50 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-400 focus:bg-gray-700 transition-all"
+                    placeholder="e.g., 15000 or 0 for free"
+                  />
+                  <p className="text-xs text-gray-400">
+                    Enter the course price in Nigerian Naira (₦). Leave empty or enter 0 for free courses.
+                  </p>
                 </div>
 
                 {/* Thumbnail Upload */}

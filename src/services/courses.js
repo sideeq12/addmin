@@ -193,7 +193,9 @@ export const courseService = {
 
   async updateSection(sectionId, updateData) {
     try {
+      console.log('📝 Updating section with ID:', sectionId, 'Data:', updateData);
       const response = await apiClient.put(`/api/sections/${sectionId}`, updateData);
+      console.log('✅ Section updated successfully:', response);
       return response;
     } catch (error) {
       console.error('Update section error:', error);
