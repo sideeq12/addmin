@@ -100,6 +100,25 @@ export const AuthProvider = ({ children }) => {
     setIsAuthenticated(false);
   };
 
+  const refreshUserDetails = async () => {
+    try {
+      setLoading(true);
+      console.log('🔄 Starting user details refresh...');
+      console.log('📊 Previous user data:', user);
+      const updatedUser = await authService.refreshUserDetails();
+      console.log('✅ User details refreshed successfully!');
+      console.log('🆕 New user data:', updatedUser);
+      console.log('💵 Account balance updated:', updatedUser?.account_balance);
+      setUser(updatedUser);
+      return updatedUser;
+    } catch (error) {
+      console.error('❌ Refresh user details error:', error);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const value = {
     user,
     userType,
@@ -108,7 +127,8 @@ export const AuthProvider = ({ children }) => {
     login,
     signup,
     logout,
-    initializeAuth
+    initializeAuth,
+    refreshUserDetails
   };
 
   return (

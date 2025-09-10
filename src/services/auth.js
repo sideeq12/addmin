@@ -143,5 +143,46 @@ export const authService = {
       this.logout();
       throw error;
     }
+  },
+
+  // Get fresh user details from server
+  async refreshUserDetails() {
+    try {
+      const userType = this.getUserType();
+      const storedUser = this.getStoredUser();
+      
+      if (!userType || !storedUser) {
+        throw new Error('No user data found');
+      }
+
+      let response;
+      if (userType === 'tutor') {
+        console.log('🔄 Fetching latest tutor details for ID:', storedUser.user.id);
+        response = await apiClient.get(`/api/tutors/${storedUser.user.id}`);
+        console.log('📋 Latest tutor details response:', response);
+        if (response.tutor) {
+          console.log('💼 Updated tutor data:', response.tutor);
+          console.log('💰 Latest account balance:', response.tutor.account_balance);
+          // Update stored user data
+          localStorage.setItem('user_data', JSON.stringify(response.tutor));
+          return response.tutor;
+        }
+      } else if (userType === 'student') {
+        console.log('🔄 Fetching latest student details for ID:', storedUser.user.id);
+        response = await apiClient.get(`/api/students/${storedUser.user.id}`);
+        console.log('📋 Latest student details response:', response);
+        if (response.student) {
+          console.log('🎓 Updated student data:', response.student);
+          // Update stored user data
+          localStorage.setItem('user_data', JSON.stringify(response.student));
+          return response.student;
+        }
+      }
+      
+      throw new Error('Failed to get user details');
+    } catch (error) {
+      console.error('Refresh user details error:', error);
+      throw error;
+    }
   }
 };

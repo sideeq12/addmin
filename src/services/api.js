@@ -16,13 +16,15 @@ class ApiClient {
       ...options,
     };
 
-    // Add auth token if available
+    // Add auth token if available (but not for signin/signup endpoints)
+    const isAuthEndpoint = endpoint.includes('/signin') || endpoint.includes('/signup');
     const token = localStorage.getItem('access_token');
-    if (token) {
+    
+    if (token && !isAuthEndpoint) {
       config.headers.Authorization = `Bearer ${token}`;
       console.log('API Request - Token added:', token.substring(0, 20) + '...');
     } else {
-      console.log('API Request - No token found');
+      console.log('API Request - No token found or auth endpoint');
     }
 
     try {

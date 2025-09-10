@@ -99,16 +99,16 @@ function Courses() {
         <Sidebar />
 
         {/* Main Content */}
-        <main className="flex-1 lg:ml-56 pl-8 p-4 lg:p-6">
+        <main className="flex-1 lg:ml-56 px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
           {/* Header */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
             <div>
-              <h1 className="text-xl font-semibold text-white mb-1">Courses</h1>
+              <h1 className="text-xl sm:text-2xl font-semibold text-white mb-1">Courses</h1>
               <p className="text-sm text-gray-400">Manage your courses and track performance</p>
             </div>
             <Link 
               to="/courses/create"
-              className="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors inline-flex items-center space-x-2 border border-gray-600"
+              className="w-full sm:w-auto bg-gray-800 hover:bg-gray-700 text-white px-4 py-3 sm:py-2 rounded-lg text-sm font-medium transition-colors inline-flex items-center justify-center space-x-2 border border-gray-600"
             >
               <MdAdd className="w-4 h-4" />
               <span>New Course</span>
@@ -130,10 +130,10 @@ function Courses() {
           )}
 
           {/* Tabs */}
-          <div className="flex space-x-1 bg-gray-800 p-1 rounded mb-4 w-fit">
+          <div className="flex w-full sm:w-fit space-x-1 bg-gray-800 p-1 rounded mb-6">
             <button 
               onClick={() => setActiveTab('all')}
-              className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+              className={`flex-1 sm:flex-initial px-4 py-2 rounded text-sm font-medium transition-colors ${
                 activeTab === 'all' 
                   ? 'bg-gray-700 text-white' 
                   : 'text-gray-400 hover:text-white hover:bg-gray-700'
@@ -143,7 +143,7 @@ function Courses() {
             </button>
             <button 
               onClick={() => setActiveTab('active')}
-              className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+              className={`flex-1 sm:flex-initial px-4 py-2 rounded text-sm font-medium transition-colors ${
                 activeTab === 'active' 
                   ? 'bg-gray-700 text-white' 
                   : 'text-gray-400 hover:text-white hover:bg-gray-700'
@@ -153,7 +153,7 @@ function Courses() {
             </button>
             <button 
               onClick={() => setActiveTab('draft')}
-              className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+              className={`flex-1 sm:flex-initial px-4 py-2 rounded text-sm font-medium transition-colors ${
                 activeTab === 'draft' 
                   ? 'bg-gray-700 text-white' 
                   : 'text-gray-400 hover:text-white hover:bg-gray-700'
@@ -174,10 +174,10 @@ function Courses() {
           ) : (
             <>
               {/* Courses Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
                 {filteredCourses.map(course => (
               <div key={course.id} className="bg-gray-800 rounded-lg overflow-hidden border border-gray-800 hover:border-gray-600 transition-colors">
-                <div className="relative h-48">
+                <div className="relative h-48 sm:h-52">
                   <img 
                     src={course.image} 
                     alt={course.title}
@@ -187,8 +187,8 @@ function Courses() {
                     }}
                     loading="lazy"
                   />
-                  <div className="absolute top-4 right-4">
-                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                  <div className="absolute top-3 right-3">
+                    <span className={`px-2 sm:px-3 py-1 rounded-full text-xs font-semibold ${
                       course.status === 'active' 
                         ? 'bg-green-600 text-white' 
                         : 'bg-yellow-600 text-white'
@@ -198,41 +198,41 @@ function Courses() {
                   </div>
                 </div>
                 
-                <div className="p-6">
-                  <h3 className="text-base font-medium text-white mb-2">{course.title}</h3>
+                <div className="p-4 sm:p-6">
+                  <h3 className="text-base sm:text-lg font-medium text-white mb-2 line-clamp-2">{course.title}</h3>
                   <div className="flex items-center justify-between mb-3">
-                    <p className="text-gray-400 text-xs">{course.subject}</p>
+                    <p className="text-gray-400 text-xs sm:text-sm">{course.subject}</p>
                     {course.status === 'draft' && (
-                      <span className="text-xs bg-orange-600/20 text-orange-400 px-2 py-1 rounded-full">
+                      <span className="text-xs bg-orange-600/20 text-orange-400 px-2 py-1 rounded-full whitespace-nowrap">
                         Needs Media
                       </span>
                     )}
                   </div>
                   
                   <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center space-x-4">
+                    <div className="flex items-center space-x-3 sm:space-x-4">
                       <div className="flex items-center space-x-1">
                         <MdStar className="w-4 h-4 text-gray-400" />
-                        <span className="text-gray-300 text-sm">{course.rating}</span>
+                        <span className="text-gray-300 text-xs sm:text-sm">{course.rating}</span>
                       </div>
                       <div className="flex items-center space-x-1">
                         <MdPeople className="w-4 h-4 text-gray-400" />
-                        <span className="text-gray-300 text-sm">{course.students}</span>
+                        <span className="text-gray-300 text-xs sm:text-sm">{course.students}</span>
                       </div>
                     </div>
                     <div className="text-gray-300 text-sm font-medium">₦{course.price?.toLocaleString() || '0'}</div>
                   </div>
                   
-                  <div className="flex space-x-2">
+                  <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
                     <Link 
                       to={`/courses/${course.id}/edit`} 
-                      className="flex-1 bg-gray-800 hover:bg-gray-700 text-white py-2 px-3 rounded-lg text-xs font-medium transition-colors text-center border border-gray-600 inline-flex items-center justify-center space-x-1"
+                      className="flex-1 bg-gray-800 hover:bg-gray-700 text-white py-3 sm:py-2 px-3 rounded-lg text-xs sm:text-sm font-medium transition-colors text-center border border-gray-600 inline-flex items-center justify-center space-x-1"
                     >
-                      <MdEdit className="w-3 h-3" />
+                      <MdEdit className="w-3 h-3 sm:w-4 sm:h-4" />
                       <span>{course.status === 'draft' ? 'Add Media' : 'Edit'}</span>
                     </Link>
-                    <button className="bg-gray-800 hover:bg-gray-700 text-white py-2 px-3 rounded-lg text-xs font-medium transition-colors border border-gray-600 inline-flex items-center space-x-1">
-                      <MdAssessment className="w-3 h-3" />
+                    <button className="flex-1 sm:flex-initial bg-gray-800 hover:bg-gray-700 text-white py-3 sm:py-2 px-3 rounded-lg text-xs sm:text-sm font-medium transition-colors border border-gray-600 inline-flex items-center justify-center space-x-1">
+                      <MdAssessment className="w-3 h-3 sm:w-4 sm:h-4" />
                       <span>Stats</span>
                     </button>
                   </div>
@@ -242,17 +242,17 @@ function Courses() {
               </div>
 
               {filteredCourses.length === 0 && (
-                <div className="text-center py-12">
-                  <MdSchool className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-                  <h3 className="text-xl font-semibold text-white mb-2">
+                <div className="text-center py-12 px-4">
+                  <MdSchool className="w-12 h-12 sm:w-16 sm:h-16 text-gray-600 mx-auto mb-4" />
+                  <h3 className="text-lg sm:text-xl font-semibold text-white mb-2">
                     {activeTab === 'all' && 'No courses found'}
                     {activeTab === 'active' && 'No published courses'}
                     {activeTab === 'draft' && 'No draft courses'}
                   </h3>
-                  <p className="text-gray-400 mb-4">Get started by creating your first course</p>
+                  <p className="text-sm sm:text-base text-gray-400 mb-6">Get started by creating your first course</p>
                   <Link 
                     to="/courses/create"
-                    className="bg-gray-800 hover:bg-gray-700 text-white px-6 py-3 rounded-lg font-medium transition-colors inline-flex items-center space-x-2 border border-gray-600"
+                    className="w-full sm:w-auto bg-gray-800 hover:bg-gray-700 text-white px-6 py-3 rounded-lg font-medium transition-colors inline-flex items-center justify-center space-x-2 border border-gray-600"
                   >
                     <MdAdd className="w-4 h-4" />
                     <span>Create New Course</span>

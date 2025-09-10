@@ -21,49 +21,49 @@ function StudentsPerformance() {
         <Sidebar />
 
         {/* Main Content */}
-        <main className="flex-1 lg:ml-56 pl-8 p-4 lg:p-6">
+        <main className="flex-1 lg:ml-56 px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
           <div className="mb-6">
-            <h1 className="text-xl font-semibold text-white mb-1">Students Performance</h1>
+            <h1 className="text-xl sm:text-2xl font-semibold text-white mb-1">Students Performance</h1>
             <p className="text-sm text-gray-400">Track student progress and achievements</p>
           </div>
 
           {/* Performance Overview */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-            <div className="bg-gray-800 p-6 rounded-lg border border-gray-700 hover:border-emerald-600/50 transition-colors">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-6">
+            <div className="bg-gray-800 p-4 sm:p-6 rounded-lg border border-gray-700 hover:border-emerald-600/50 transition-colors">
               <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 bg-emerald-600/10 rounded-lg flex items-center justify-center border border-emerald-600/20">
-                  <MdTrendingUp className="w-6 h-6 text-emerald-400" />
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-emerald-600/10 rounded-lg flex items-center justify-center border border-emerald-600/20">
+                  <MdTrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400" />
                 </div>
-                <div className="text-3xl font-bold text-emerald-400">78%</div>
+                <div className="text-2xl sm:text-3xl font-bold text-emerald-400">78%</div>
               </div>
-              <p className="text-gray-400 text-center">Average Progress</p>
+              <p className="text-gray-400 text-center text-sm">Average Progress</p>
             </div>
-            <div className="bg-gray-800 p-6 rounded-lg border border-gray-700 hover:border-yellow-600/50 transition-colors">
+            <div className="bg-gray-800 p-4 sm:p-6 rounded-lg border border-gray-700 hover:border-yellow-600/50 transition-colors">
               <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 bg-yellow-600/10 rounded-lg flex items-center justify-center border border-yellow-600/20">
-                  <MdStar className="w-6 h-6 text-yellow-400" />
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-yellow-600/10 rounded-lg flex items-center justify-center border border-yellow-600/20">
+                  <MdStar className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-400" />
                 </div>
-                <div className="text-3xl font-bold text-yellow-400">4.6/5</div>
+                <div className="text-2xl sm:text-3xl font-bold text-yellow-400">4.6/5</div>
               </div>
-              <p className="text-gray-400 text-center">Average Grade</p>
+              <p className="text-gray-400 text-center text-sm">Average Grade</p>
             </div>
-            <div className="bg-gray-800 p-6 rounded-lg border border-gray-700 hover:border-blue-600/50 transition-colors">
+            <div className="bg-gray-800 p-4 sm:p-6 rounded-lg border border-gray-700 hover:border-blue-600/50 transition-colors">
               <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 bg-blue-600/10 rounded-lg flex items-center justify-center border border-blue-600/20">
-                  <MdCheckCircle className="w-6 h-6 text-blue-400" />
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-600/10 rounded-lg flex items-center justify-center border border-blue-600/20">
+                  <MdCheckCircle className="w-5 h-5 sm:w-6 sm:h-6 text-blue-400" />
                 </div>
-                <div className="text-3xl font-bold text-blue-400">92%</div>
+                <div className="text-2xl sm:text-3xl font-bold text-blue-400">92%</div>
               </div>
-              <p className="text-gray-400 text-center">Completion Rate</p>
+              <p className="text-gray-400 text-center text-sm">Completion Rate</p>
             </div>
           </div>
 
           {/* Students Table */}
           <div className="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden">
-            <div className="p-6 border-b border-gray-700">
+            <div className="p-4 sm:p-6 border-b border-gray-700">
               <div className="flex items-center space-x-2">
-                <MdSchool className="w-5 h-5 text-gray-400" />
-                <h3 className="text-xl font-semibold text-white">Student Progress</h3>
+                <MdSchool className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
+                <h3 className="text-base sm:text-xl font-semibold text-white">Student Progress</h3>
               </div>
             </div>
             <div className="overflow-x-auto">

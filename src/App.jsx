@@ -13,7 +13,7 @@ import Dashboard from './pages/Dashboard'
 import Courses from './pages/Courses'
 import CreateCourse from './pages/CreateCourse'
 import EditCourse from './pages/EditCourse'
-import Analytics from './pages/Analytics'
+import Quiz from './pages/Quiz'
 import StudentsPerformance from './pages/StudentsPerformance'
 import Earnings from './pages/Earnings'
 import Support from './pages/Support'
@@ -102,9 +102,9 @@ function App() {
               <EditCourse />
             </ProtectedRoute>
           } />
-          <Route path="/analytics" element={
+          <Route path="/quiz" element={
             <ProtectedRoute requiredUserType="tutor">
-              <Analytics />
+              <Quiz />
             </ProtectedRoute>
           } />
           <Route path="/students-performance" element={

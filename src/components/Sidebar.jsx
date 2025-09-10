@@ -81,15 +81,15 @@ function Sidebar() {
         </Link>
         
         <Link 
-          to="/analytics" 
+          to="/quiz" 
           className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 ${
-            isActive('/analytics') 
+            isActive('/quiz') 
               ? 'text-white bg-gray-800 shadow-md border border-gray-600' 
               : 'text-gray-300 hover:text-white hover:bg-gray-800 hover:shadow-sm'
           }`}
         >
           <MdAnalytics className="w-5 h-5" />
-          <span className="font-medium">Analytics</span>
+          <span className="font-medium">Quiz</span>
         </Link>
         
         <Link 

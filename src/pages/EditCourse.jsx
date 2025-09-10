@@ -503,7 +503,7 @@ function EditCourse() {
 
         <main className="flex-1 lg:ml-56 bg-black min-h-screen">
           {/* Header Bar */}
-          <div className="bg-gray-900 border-b border-gray-700 px-8 py-4 sticky top-0 z-10">
+          <div className="bg-gray-900 border-b border-gray-700 px-4 sm:px-6 lg:px-8 py-4 sticky top-0 z-10">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
                 <button
@@ -550,7 +550,7 @@ function EditCourse() {
             </div>
           </div>
 
-          <div className="px-8 py-6 max-w-7xl mx-auto">
+          <div className="px-4 sm:px-6 lg:px-8 py-4 sm:py-6 max-w-7xl mx-auto">
 
             {error && (
               <div className="mb-6 p-4 bg-red-900/30 border border-red-700/50 rounded-lg">
@@ -559,9 +559,9 @@ function EditCourse() {
             )}
 
             {/* Course Overview Card */}
-            <div className="bg-gray-900 rounded-xl border border-gray-700 shadow-sm mb-6">
-              <div className="p-6">
-                <div className="flex items-start space-x-6">
+            <div className="bg-gray-900 rounded-xl border border-gray-700 shadow-sm mb-4 sm:mb-6">
+              <div className="p-4 sm:p-6">
+                <div className="flex flex-col sm:flex-row sm:items-start space-y-4 sm:space-y-0 sm:space-x-6">
                   {/* Course Thumbnail */}
                   <div className="flex-shrink-0">
                     {formData.thumbnailUrl ? (
@@ -594,7 +594,7 @@ function EditCourse() {
                       </div>
                     </div>
                     
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 mb-4">
                       <div className="bg-gray-800 rounded-lg p-3">
                         <div className="flex items-center space-x-2 mb-1">
                           <MdFolder className="w-4 h-4 text-gray-400" />
@@ -638,8 +638,8 @@ function EditCourse() {
 
             {/* Course Content */}
             <div className="bg-gray-900 rounded-xl border border-gray-700 shadow-sm">
-              <div className="border-b border-gray-700 p-6">
-                <div className="flex justify-between items-center">
+              <div className="border-b border-gray-700 p-4 sm:p-6">
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-4 sm:space-y-0">
                   <div>
                     <h3 className="text-lg font-semibold text-white">Course Curriculum</h3>
                     <p className="text-gray-400 text-sm mt-1">Organize your course into sections and lessons</p>
@@ -647,7 +647,7 @@ function EditCourse() {
                   <button
                     type="button"
                     onClick={() => setShowAddSection(!showAddSection)}
-                    className="inline-flex items-center space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors shadow-sm"
+                    className="inline-flex items-center justify-center space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors shadow-sm w-full sm:w-auto"
                   >
                     <MdAdd className="w-4 h-4" />
                     <span>Add Section</span>
@@ -655,7 +655,7 @@ function EditCourse() {
                 </div>
               </div>
 
-              <div className="p-6">
+              <div className="p-4 sm:p-6">
 
                 {/* Add Section Form */}
                 {showAddSection && (
