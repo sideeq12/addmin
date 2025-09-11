@@ -68,6 +68,19 @@ class ApiClient {
     });
   }
 
+  async patch(endpoint, body) {
+    console.log('🔧 === API CLIENT PATCH REQUEST ===');
+    console.log('🌐 Endpoint:', endpoint);
+    console.log('📦 Body:', JSON.stringify(body, null, 2));
+    console.log('📦 Body type:', typeof body);
+    console.log('📦 Stringified body:', JSON.stringify(body));
+    
+    return this.request(endpoint, {
+      method: 'PATCH',
+      body: JSON.stringify(body),
+    });
+  }
+
   async delete(endpoint) {
     return this.request(endpoint, {
       method: 'DELETE',

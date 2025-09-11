@@ -172,13 +172,37 @@ export const uploadService = {
     }
   },
 
-  // Document Upload for Section Resources
-  async uploadDocument(documentFile, onProgress = null) {
+  // Create Document Record
+  async createDocumentRecord(documentData) {
     try {
-      console.log('📄 Uploading document to /api/uploads/document');
+      console.log('Creating document record with data:', documentData);
+      
+      const response = await apiClient.post('/api/document', {
+        course_id: documentData.course_id,
+        section_id: documentData.section_id,
+        title: documentData.title,
+        description: documentData.description,
+        document_url: documentData.document_url,
+        file_type: documentData.file_type,
+        file_size: documentData.file_size
+      });
+
+      console.log('Document record created successfully:', response);
+      return response;
+    } catch (error) {
+      console.error('Create document record error:', error);
+      throw error;
+    }
+  },
+
+  // Document Upload to Section (Single API Call)
+  async uploadDocumentToSection(documentFile, sectionId, onProgress = null) {
+    try {
+      console.log('📄 Uploading document to section via single API call');
       
       const formData = new FormData();
       formData.append('file', documentFile);
+      formData.append('sectionId', sectionId);
 
       // Create XMLHttpRequest for progress tracking
       return new Promise((resolve, reject) => {
@@ -201,7 +225,7 @@ export const uploadService = {
           if (xhr.status === 200) {
             try {
               const response = JSON.parse(xhr.responseText);
-              console.log('📄 Document uploaded successfully:', response);
+              console.log('📄 Document uploaded and section updated successfully:', response);
               resolve(response);
             } catch (error) {
               reject(new Error('Invalid response format'));
@@ -229,7 +253,7 @@ export const uploadService = {
         // Set timeout to 5 minutes for documents
         xhr.timeout = 300000;
 
-        xhr.open('POST', `${apiClient.baseURL}/api/uploads/document`);
+        xhr.open('POST', `${apiClient.baseURL}/api/uploads/document/section`);
         
         // Add authorization header
         const token = localStorage.getItem('access_token');
@@ -237,16 +261,27 @@ export const uploadService = {
           xhr.setRequestHeader('Authorization', `Bearer ${token}`);
         }
 
-        xhr.send(formData);
-        console.log('📤 Document upload request sent to /api/uploads/document');
-        console.log('📤 Request details:', {
-          method: 'POST',
-          url: `${apiClient.baseURL}/api/uploads/document`,
-          fileSize: documentFile.size,
-          fileName: documentFile.name,
-          fileType: documentFile.type,
-          hasAuthToken: !!token
+        // Log detailed request information BEFORE sending
+        console.log('📤 === SINGLE DOCUMENT UPLOAD REQUEST DETAILS ===');
+        console.log('🌐 URL:', `${apiClient.baseURL}/api/uploads/document/section`);
+        console.log('🔑 Auth Token:', token ? `${token.substring(0, 20)}...` : 'NOT_FOUND');
+        console.log('🎯 Section ID:', sectionId, 'Type:', typeof sectionId);
+        console.log('📁 File Details:', {
+          name: documentFile.name,
+          size: documentFile.size,
+          type: documentFile.type,
+          lastModified: new Date(documentFile.lastModified).toISOString()
         });
+        console.log('📦 FormData Keys:', Array.from(formData.keys()));
+        console.log('📦 FormData Values:', Array.from(formData.entries()).map(([key, value]) => [key, value instanceof File ? `File: ${value.name}` : value]));
+        console.log('🔧 XHR Config:', {
+          method: 'POST',
+          timeout: xhr.timeout,
+          responseType: xhr.responseType
+        });
+
+        xhr.send(formData);
+        console.log('📤 Single document upload request sent to /api/uploads/document/section');
       });
     } catch (error) {
       console.error('Document upload error:', error);

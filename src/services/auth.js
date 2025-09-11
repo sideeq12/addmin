@@ -145,6 +145,39 @@ export const authService = {
     }
   },
 
+  // Password Reset Functions
+  async forgotPassword(email, userType) {
+    try {
+      const endpoint = userType === 'student' 
+        ? '/api/students/forgot-password'
+        : '/api/tutors/forgot-password';
+      
+      const response = await apiClient.post(endpoint, { email });
+      return response;
+    } catch (error) {
+      console.error('Forgot password error:', error);
+      throw error;
+    }
+  },
+
+  async resetPassword(email, token, password, userType) {
+    try {
+      const endpoint = userType === 'student'
+        ? '/api/students/reset-password'
+        : '/api/tutors/reset-password';
+      
+      const response = await apiClient.post(endpoint, { 
+        email, 
+        token, 
+        password 
+      });
+      return response;
+    } catch (error) {
+      console.error('Reset password error:', error);
+      throw error;
+    }
+  },
+
   // Get fresh user details from server
   async refreshUserDetails() {
     try {

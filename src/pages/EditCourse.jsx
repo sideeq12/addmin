@@ -245,6 +245,23 @@ function EditCourse() {
   const handleAddVideo = async (e, sectionId) => {
     e.preventDefault()
     
+    console.log('🎬 === VIDEO UPLOAD PROCESS STARTED ===')
+    console.log('🎯 VIDEO - Section ID received:', sectionId)
+    console.log('🎯 VIDEO - Section ID type:', typeof sectionId)
+    console.log('🎯 VIDEO - Current course ID:', courseId)
+    
+    // Find the section in state to compare
+    const targetSection = sections.find(s => s.id === sectionId)
+    console.log('🔍 VIDEO - Target section found in state:', targetSection ? 'YES' : 'NO')
+    if (targetSection) {
+      console.log('📋 VIDEO - Section details:', {
+        id: targetSection.id,
+        title: targetSection.title,
+        position: targetSection.position
+      })
+    }
+    console.log('📋 VIDEO - All available sections:', sections.map(s => ({id: s.id, title: s.title})))
+    
     if (!newVideo.title.trim()) {
       setError('Video title is required')
       return
@@ -287,7 +304,11 @@ function EditCourse() {
         preview: newVideo.preview
       }
 
-      console.log('🎥 Creating video record with data:', videoData)
+      console.log('🎥 === VIDEO API CALL DETAILS ===')
+      console.log('🌐 Video endpoint: POST /api/videos')
+      console.log('📦 Video payload:', videoData)
+      console.log('🆔 Video payload section_id:', videoData.section_id)
+      console.log('🆔 Video payload section_id type:', typeof videoData.section_id)
       
       const response = await uploadService.createVideoRecord(videoData)
 
@@ -399,69 +420,73 @@ function EditCourse() {
     const file = e.target.files[0]
     if (!file) return
 
+    console.log('🚀 === DOCUMENT UPLOAD PROCESS STARTED ===')
+    console.log('📁 File selected:', {
+      name: file.name,
+      size: file.size,
+      type: file.type,
+      lastModified: file.lastModified
+    })
+    console.log('🎯 DOCUMENT - Section ID received:', sectionId)
+    console.log('🎯 DOCUMENT - Section ID type:', typeof sectionId)
+    console.log('🎯 DOCUMENT - Current course ID:', courseId)
+    
+    // Find the section in state to compare
+    const targetSection = sections.find(s => s.id === sectionId)
+    console.log('🔍 DOCUMENT - Target section found in state:', targetSection ? 'YES' : 'NO')
+    if (targetSection) {
+      console.log('📋 DOCUMENT - Section details:', {
+        id: targetSection.id,
+        title: targetSection.title,
+        position: targetSection.position,
+        resources: targetSection.resources ? 'HAS_RESOURCES' : 'NO_RESOURCES'
+      })
+    }
+    console.log('📋 DOCUMENT - All available sections:', sections.map(s => ({id: s.id, title: s.title})))
+
     try {
       setUploadingDocument(true)
       setDocumentUploadProgress(0)
       setError('')
 
-      console.log('🎯 Document upload started for section:', sectionId)
-      console.log('🎯 Current sections state length:', sections.length)
+      console.log('📋 Current sections in state:', sections.map(s => ({
+        id: s.id,
+        title: s.title,
+        resources: s.resources ? 'HAS_RESOURCES' : 'NO_RESOURCES'
+      })))
 
       // Validate document file
+      console.log('✅ STEP 1: Validating document file...')
       uploadService.validateDocumentFile(file)
+      console.log('✅ File validation passed')
 
-      console.log('📄 Starting document upload process...')
-      console.log('Document file:', file.name, file.size)
-
-      // Step 1: Upload document file to get URL
-      const uploadResponse = await uploadService.uploadDocument(
+      // Single API call: Upload document and update section
+      console.log('📤 STEP 2: Uploading document and updating section via single API call...')
+      console.log('🌐 Single endpoint: POST /api/uploads/document/section')
+      console.log('📦 FormData payload: file + sectionId')
+      
+      const response = await uploadService.uploadDocumentToSection(
         file,
-        (progress) => setDocumentUploadProgress(progress)
+        sectionId,
+        (progress) => {
+          console.log(`📊 Upload progress: ${progress}%`)
+          setDocumentUploadProgress(progress)
+        }
       )
 
-      console.log('📤 Document upload response:', uploadResponse)
+      console.log('✅ STEP 2 COMPLETED: Document uploaded and section updated')
+      console.log('📤 Response:', response)
 
-      if (!uploadResponse.success || !uploadResponse.url) {
-        throw new Error('Document upload failed - no URL returned')
-      }
-
-      // Step 2: Update section resources with the uploaded URL
-      console.log('🔍 Looking for section with ID:', sectionId)
-      console.log('🔍 Available sections:', sections.map(s => ({id: s.id, title: s.title})))
-      
-      const currentSection = sections.find(s => s.id === sectionId)
-      
-      if (!currentSection) {
-        console.error('❌ Section not found locally!', {
-          searchId: sectionId,
-          availableSections: sections.map(s => s.id)
-        })
-        throw new Error(`Section with ID ${sectionId} not found`)
-      }
-      
-      console.log('📋 Current section data:', currentSection)
-      
-      const updateData = {
-        title: currentSection.title || '',
-        position: currentSection.position || 1,
-        resources: uploadResponse.url
+      if (!response.success) {
+        throw new Error(response.error || response.message || 'Document upload failed')
       }
 
-      console.log('📝 Updating section resources with data:', updateData)
-      console.log('🌐 Making API call to update section ID:', sectionId)
-      console.log('🌐 API endpoint will be: /api/sections/' + sectionId)
+      console.log('📄 Document details:', response.document)
+      console.log('📋 Section updated:', response.section)
       
-      const response = await courseService.updateSection(sectionId, updateData)
-      
-      console.log('✅ Section resources updated successfully:', response)
-      
-      // Check if update was actually successful
-      if (!response || (response.success === false)) {
-        throw new Error(response?.error || response?.message || 'Section update failed - no success confirmation')
-      }
-      
-      // Reload sections to show new resource
+      console.log('🔄 STEP 3: Reloading sections to show changes...')
       await loadSections()
+      console.log('✅ Sections reloaded')
       
       // Hide the add document form
       setShowAddDocument(prev => ({
@@ -469,14 +494,19 @@ function EditCourse() {
         [sectionId]: false
       }))
 
+      console.log('🎉 === DOCUMENT UPLOAD PROCESS COMPLETED SUCCESSFULLY ===')
+
     } catch (err) {
-      console.error('Document upload error:', err)
+      console.error('💥 === DOCUMENT UPLOAD PROCESS FAILED ===')
+      console.error('❌ Final error:', err.message)
+      console.error('❌ Full error object:', err)
       setError(err.message || 'Failed to upload document')
     } finally {
       setUploadingDocument(false)
       setDocumentUploadProgress(0)
       // Reset file input
       e.target.value = ''
+      console.log('🧹 Cleanup completed')
     }
   }
 
@@ -769,7 +799,10 @@ function EditCourse() {
                                   <span>Video Lessons</span>
                                 </h5>
                                 <button
-                                  onClick={() => toggleAddVideo(section.id)}
+                                  onClick={() => {
+                                    console.log('🎬 VIDEO BUTTON - Section ID:', section.id, 'Type:', typeof section.id)
+                                    toggleAddVideo(section.id)
+                                  }}
                                   className="inline-flex items-center space-x-2 px-3 py-2 text-emerald-300 bg-emerald-900/20 hover:bg-emerald-900/30 rounded-lg text-sm font-medium transition-colors border border-emerald-700/50"
                                 >
                                   <MdAdd className="w-4 h-4" />
@@ -966,10 +999,13 @@ function EditCourse() {
                                   <span>Learning Materials</span>
                                 </h5>
                                 <button 
-                                  onClick={() => setShowAddDocument(prev => ({
-                                    ...prev,
-                                    [section.id]: !prev[section.id]
-                                  }))}
+                                  onClick={() => {
+                                    console.log('📄 DOCUMENT BUTTON - Section ID:', section.id, 'Type:', typeof section.id)
+                                    setShowAddDocument(prev => ({
+                                      ...prev,
+                                      [section.id]: !prev[section.id]
+                                    }))
+                                  }}
                                   className="inline-flex items-center space-x-2 px-3 py-2 text-amber-300 bg-amber-900/20 hover:bg-amber-900/30 rounded-lg text-sm font-medium transition-colors border border-amber-700/50"
                                 >
                                   <MdAdd className="w-4 h-4" />

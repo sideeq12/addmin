@@ -193,12 +193,62 @@ export const courseService = {
 
   async updateSection(sectionId, updateData) {
     try {
-      console.log('📝 Updating section with ID:', sectionId, 'Data:', updateData);
+      console.log('🔧 === SECTION UPDATE API CALL ===');
+      console.log('🎯 Section ID:', sectionId);
+      console.log('📦 Update data:', updateData);
+      console.log('🌐 API endpoint:', `/api/sections/${sectionId}`);
+      console.log('🌐 HTTP method: PUT');
+      
       const response = await apiClient.put(`/api/sections/${sectionId}`, updateData);
-      console.log('✅ Section updated successfully:', response);
+      
+      console.log('✅ Section update API response:', response);
+      console.log('✅ Response type:', typeof response);
+      console.log('✅ Response keys:', Object.keys(response || {}));
+      
       return response;
     } catch (error) {
       console.error('Update section error:', error);
+      throw error;
+    }
+  },
+
+  async updateSectionResources(sectionId, resourcesUrl) {
+    try {
+      console.log('🔧 === SECTION RESOURCES UPDATE API CALL ===');
+      console.log('🎯 Section ID:', sectionId, 'Type:', typeof sectionId);
+      console.log('📄 Resources URL:', resourcesUrl);
+      console.log('🌐 Full API endpoint:', `${apiClient.baseURL}/api/sections/${sectionId}/resources`);
+      console.log('🌐 HTTP method: PATCH');
+      
+      // Get auth token for logging
+      const token = localStorage.getItem('access_token');
+      console.log('🔑 Auth Token:', token ? `${token.substring(0, 20)}...` : 'NOT_FOUND');
+      
+      const updateData = {
+        resources: resourcesUrl
+      };
+      console.log('📦 PATCH payload:', JSON.stringify(updateData, null, 2));
+      console.log('📦 Payload type:', typeof updateData);
+      console.log('📦 Payload keys:', Object.keys(updateData));
+      
+      const response = await apiClient.patch(`/api/sections/${sectionId}/resources`, updateData);
+      
+      console.log('✅ Section resources update API response:', response);
+      console.log('✅ Response type:', typeof response);
+      console.log('✅ Response keys:', Object.keys(response || {}));
+      console.log('✅ Full response object:', JSON.stringify(response, null, 2));
+      
+      return response;
+    } catch (error) {
+      console.error('❌ Update section resources error:', error);
+      console.error('❌ Error message:', error.message);
+      console.error('❌ Error type:', typeof error);
+      console.error('❌ Error constructor:', error.constructor.name);
+      if (error.response) {
+        console.error('❌ HTTP Response Status:', error.response.status);
+        console.error('❌ HTTP Response Data:', error.response.data);
+      }
+      console.error('❌ Full error object:', JSON.stringify(error, Object.getOwnPropertyNames(error), 2));
       throw error;
     }
   },

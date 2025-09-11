@@ -17,6 +17,8 @@ import Quiz from './pages/Quiz'
 import StudentsPerformance from './pages/StudentsPerformance'
 import Earnings from './pages/Earnings'
 import Support from './pages/Support'
+import ForgotPassword from './pages/ForgotPassword'
+import ResetPassword from './pages/ResetPassword'
 import './App.css'
 
 function App() {
@@ -80,6 +82,10 @@ function App() {
               <Footer />
             </>
           } />
+          
+          {/* Password Reset routes without Navbar and Footer */}
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
 
           {/* Protected Dashboard routes without Navbar and Footer */}
           <Route path="/dashboard" element={
