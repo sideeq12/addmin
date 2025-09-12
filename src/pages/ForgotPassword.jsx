@@ -51,7 +51,7 @@ function ForgotPassword() {
             
             <div className="space-y-4">
               <Link
-                to={userType === 'student' ? '/student/signin' : '/tutor/signin'}
+                to="/tutor/signin"
                 className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
               >
                 Back to Sign In
@@ -75,7 +75,7 @@ function ForgotPassword() {
       <div className="max-w-md w-full space-y-8">
         <div>
           <Link
-            to={userType === 'student' ? '/student/signin' : '/tutor/signin'}
+            to="/tutor/signin"
             className="flex items-center text-blue-400 hover:text-blue-300 mb-6 transition-colors"
           >
             <MdArrowBack className="w-4 h-4 mr-2" />
@@ -86,7 +86,7 @@ function ForgotPassword() {
             Forgot your password?
           </h2>
           <p className="mt-2 text-center text-sm text-gray-400">
-            Enter your email address and we'll send you a reset link
+            Enter your tutor email address and we'll send you a reset link
           </p>
         </div>
         
@@ -98,34 +98,6 @@ function ForgotPassword() {
           )}
           
           <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Account Type
-              </label>
-              <div className="flex space-x-4">
-                <label className="flex items-center">
-                  <input
-                    type="radio"
-                    value="tutor"
-                    checked={userType === 'tutor'}
-                    onChange={(e) => setUserType(e.target.value)}
-                    className="text-blue-600 bg-gray-700 border-gray-600 focus:ring-blue-500"
-                  />
-                  <span className="ml-2 text-gray-300">Tutor</span>
-                </label>
-                <label className="flex items-center">
-                  <input
-                    type="radio"
-                    value="student"
-                    checked={userType === 'student'}
-                    onChange={(e) => setUserType(e.target.value)}
-                    className="text-blue-600 bg-gray-700 border-gray-600 focus:ring-blue-500"
-                  />
-                  <span className="ml-2 text-gray-300">Student</span>
-                </label>
-              </div>
-            </div>
-            
             <div>
               <label htmlFor="email" className="sr-only">
                 Email address
@@ -163,7 +135,7 @@ function ForgotPassword() {
             <p className="text-sm text-gray-400">
               Remember your password?{' '}
               <Link
-                to={userType === 'student' ? '/student/signin' : '/tutor/signin'}
+                to="/tutor/signin"
                 className="font-medium text-blue-400 hover:text-blue-300 transition-colors"
               >
                 Sign in

@@ -67,6 +67,8 @@ function EditCourse() {
   const [showAddDocument, setShowAddDocument] = useState({})
   const [uploadingDocument, setUploadingDocument] = useState(false)
   const [documentUploadProgress, setDocumentUploadProgress] = useState(0)
+  const [showDocumentPreview, setShowDocumentPreview] = useState(false)
+  const [currentDocument, setCurrentDocument] = useState(null)
 
   // Load course data
   useEffect(() => {
@@ -349,19 +351,36 @@ function EditCourse() {
     setCurrentVideo(null)
   }
 
-  // Handle keyboard events for video player
+  const handlePreviewDocument = (documentUrl, fileName) => {
+    setCurrentDocument({
+      url: documentUrl,
+      name: fileName || 'Document'
+    })
+    setShowDocumentPreview(true)
+  }
+
+  const handleCloseDocumentPreview = () => {
+    setShowDocumentPreview(false)
+    setCurrentDocument(null)
+  }
+
+  // Handle keyboard events for video player and document preview
   useEffect(() => {
     const handleKeyDown = (event) => {
-      if (event.key === 'Escape' && showVideoPlayer) {
-        handleCloseVideoPlayer()
+      if (event.key === 'Escape') {
+        if (showVideoPlayer) {
+          handleCloseVideoPlayer()
+        } else if (showDocumentPreview) {
+          handleCloseDocumentPreview()
+        }
       }
     }
 
-    if (showVideoPlayer) {
+    if (showVideoPlayer || showDocumentPreview) {
       document.addEventListener('keydown', handleKeyDown)
       return () => document.removeEventListener('keydown', handleKeyDown)
     }
-  }, [showVideoPlayer])
+  }, [showVideoPlayer, showDocumentPreview])
 
   const handlePublishCourse = async () => {
     if (!courseId) return
@@ -1084,14 +1103,21 @@ function EditCourse() {
                                       <p className="text-gray-300 text-xs">Click to download or view</p>
                                     </div>
                                     <div className="flex items-center space-x-2">
+                                      <button
+                                        onClick={() => handlePreviewDocument(section.resources, 'Learning Resource')}
+                                        className="p-2 text-amber-400 hover:text-amber-300 hover:bg-amber-600/10 rounded-lg transition-colors"
+                                        title="Preview document"
+                                      >
+                                        <MdVisibility className="w-4 h-4" />
+                                      </button>
                                       <a
                                         href={section.resources}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="p-2 text-amber-400 hover:text-amber-300 hover:bg-amber-600/10 rounded-lg transition-colors"
-                                        title="Open resource"
+                                        className="p-2 text-blue-400 hover:text-blue-300 hover:bg-blue-600/10 rounded-lg transition-colors"
+                                        title="Download resource"
                                       >
-                                        <MdVisibility className="w-4 h-4" />
+                                        <MdFullscreen className="w-4 h-4" />
                                       </a>
                                       <button className="p-2 text-gray-400 hover:text-red-400 hover:bg-red-600/10 rounded-lg transition-colors">
                                         <MdDelete className="w-4 h-4" />
@@ -1188,6 +1214,80 @@ function EditCourse() {
                   Created: {new Date(currentVideo.created_at).toLocaleDateString()}
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Document Preview Modal */}
+      {showDocumentPreview && currentDocument && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm">
+          <div className="relative w-full max-w-6xl mx-4 h-[90vh]">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between mb-4 px-2">
+              <div>
+                <h3 className="text-white font-semibold text-lg">{currentDocument.name}</h3>
+                <p className="text-gray-300 text-sm mt-1">Document Preview</p>
+              </div>
+              <div className="flex items-center space-x-2">
+                <a
+                  href={currentDocument.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-2 text-gray-400 hover:text-white hover:bg-gray-700/50 rounded-lg transition-colors"
+                  title="Open in new tab"
+                >
+                  <MdFullscreen className="w-5 h-5" />
+                </a>
+                <button
+                  onClick={handleCloseDocumentPreview}
+                  className="p-2 text-gray-400 hover:text-white hover:bg-gray-700/50 rounded-lg transition-colors"
+                >
+                  <MdClose className="w-6 h-6" />
+                </button>
+              </div>
+            </div>
+
+            {/* Document Viewer */}
+            <div className="relative bg-white rounded-lg overflow-hidden shadow-2xl h-full">
+              {currentDocument.url.toLowerCase().includes('.pdf') ? (
+                // PDF Viewer
+                <iframe
+                  src={`${currentDocument.url}#toolbar=1&navpanes=1&scrollbar=1`}
+                  className="w-full h-full border-0"
+                  title={currentDocument.name}
+                />
+              ) : (
+                // Other document types - fallback to browser's default handling
+                <div className="flex flex-col items-center justify-center h-full p-8 text-center">
+                  <div className="w-24 h-24 bg-amber-600/20 rounded-2xl flex items-center justify-center mb-6">
+                    <MdDescription className="w-12 h-12 text-amber-400" />
+                  </div>
+                  <h3 className="text-gray-800 text-xl font-semibold mb-2">{currentDocument.name}</h3>
+                  <p className="text-gray-600 text-sm mb-6">
+                    This document type cannot be previewed directly in the browser.
+                  </p>
+                  <div className="flex space-x-4">
+                    <a
+                      href={currentDocument.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center space-x-2 px-6 py-3 bg-amber-600 hover:bg-amber-700 text-white rounded-lg font-medium transition-colors shadow-sm"
+                    >
+                      <MdFullscreen className="w-5 h-5" />
+                      <span>Open in New Tab</span>
+                    </a>
+                    <a
+                      href={currentDocument.url}
+                      download
+                      className="inline-flex items-center space-x-2 px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-medium transition-colors shadow-sm"
+                    >
+                      <MdCloudUpload className="w-5 h-5" />
+                      <span>Download</span>
+                    </a>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

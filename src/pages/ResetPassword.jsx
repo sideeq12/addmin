@@ -8,11 +8,10 @@ function ResetPassword() {
   const navigate = useNavigate()
   
   const [formData, setFormData] = useState({
-    email: '',
     password: '',
     confirmPassword: ''
   })
-  const [userType, setUserType] = useState('tutor')
+  const [userType] = useState('tutor')
   const [token, setToken] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -21,30 +20,29 @@ function ResetPassword() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
   useEffect(() => {
-    // Extract token and email from URL parameters
-    const urlToken = searchParams.get('token')
-    const urlEmail = searchParams.get('email')
-    const urlUserType = searchParams.get('type')
+    // Extract JWT token from URL fragment (hash) - new method
+    const urlParams = new URLSearchParams(window.location.hash.substring(1));
+    const jwtToken = urlParams.get('access_token');
     
-    if (urlToken) {
-      setToken(urlToken)
-    }
-    if (urlEmail) {
-      setFormData(prev => ({ ...prev, email: urlEmail }))
-    }
-    if (urlUserType && ['student', 'tutor'].includes(urlUserType)) {
-      setUserType(urlUserType)
-    }
+    console.log('🔗 Password reset page loaded:');
+    console.log('🌐 Full URL:', window.location.href);
+    console.log('🔗 Hash params:', window.location.hash);
+    console.log('🎫 JWT Token found:', jwtToken ? 'YES' : 'NO');
+    console.log('👤 User type: tutor (fixed)');
     
-    if (!urlToken) {
-      setError('Invalid reset link. Please request a new password reset.')
+    if (jwtToken) {
+      setToken(jwtToken);
+      console.log('✅ JWT token set:', jwtToken.substring(0, 20) + '...');
+    } else {
+      console.log('❌ No JWT token found in URL fragment');
+      setError('Invalid reset link. Please request a new password reset.');
     }
   }, [searchParams])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     
-    if (!formData.email || !formData.password || !formData.confirmPassword) {
+    if (!formData.password || !formData.confirmPassword) {
       setError('All fields are required')
       return
     }
@@ -68,15 +66,23 @@ function ResetPassword() {
       setLoading(true)
       setError('')
       
-      await authService.resetPassword(formData.email, token, formData.password, userType)
+      console.log('🚀 Submitting password reset with:', {
+        userType,
+        hasToken: !!token,
+        passwordLength: formData.password.length
+      });
+      
+      await authService.resetPassword(token, formData.password, userType)
       setSuccess(true)
       
-      // Redirect to signin after 3 seconds
+      console.log('✅ Password reset successful, redirecting...');
+      
+      // Redirect to login after 3 seconds
       setTimeout(() => {
-        navigate(userType === 'student' ? '/student/signin' : '/tutor/signin')
+        navigate('/login')
       }, 3000)
     } catch (err) {
-      console.error('Reset password error:', err)
+      console.error('❌ Reset password error:', err)
       setError(err.message || 'Failed to reset password')
     } finally {
       setLoading(false)
@@ -100,7 +106,7 @@ function ResetPassword() {
             </p>
             
             <Link
-              to={userType === 'student' ? '/student/signin' : '/tutor/signin'}
+              to="/login"
               className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
             >
               Go to Sign In
@@ -119,7 +125,7 @@ function ResetPassword() {
             Reset your password
           </h2>
           <p className="mt-2 text-center text-sm text-gray-400">
-            Enter your new password below
+            Enter your new password below. Your email will be automatically detected from the reset link.
           </p>
         </div>
         
@@ -131,51 +137,6 @@ function ResetPassword() {
           )}
           
           <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Account Type
-              </label>
-              <div className="flex space-x-4">
-                <label className="flex items-center">
-                  <input
-                    type="radio"
-                    value="tutor"
-                    checked={userType === 'tutor'}
-                    onChange={(e) => setUserType(e.target.value)}
-                    className="text-blue-600 bg-gray-700 border-gray-600 focus:ring-blue-500"
-                  />
-                  <span className="ml-2 text-gray-300">Tutor</span>
-                </label>
-                <label className="flex items-center">
-                  <input
-                    type="radio"
-                    value="student"
-                    checked={userType === 'student'}
-                    onChange={(e) => setUserType(e.target.value)}
-                    className="text-blue-600 bg-gray-700 border-gray-600 focus:ring-blue-500"
-                  />
-                  <span className="ml-2 text-gray-300">Student</span>
-                </label>
-              </div>
-            </div>
-            
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1">
-                Email address
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                value={formData.email}
-                onChange={(e) => setFormData({...formData, email: e.target.value})}
-                className="appearance-none relative block w-full px-3 py-3 border border-gray-600 placeholder-gray-400 text-white bg-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                placeholder="Email address"
-              />
-            </div>
-            
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-1">
                 New Password
@@ -257,7 +218,7 @@ function ResetPassword() {
             <p className="text-sm text-gray-400">
               Remember your password?{' '}
               <Link
-                to={userType === 'student' ? '/student/signin' : '/tutor/signin'}
+                to="/login"
                 className="font-medium text-blue-400 hover:text-blue-300 transition-colors"
               >
                 Sign in

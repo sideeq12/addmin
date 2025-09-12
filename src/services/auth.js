@@ -160,20 +160,28 @@ export const authService = {
     }
   },
 
-  async resetPassword(email, token, password, userType) {
+  async resetPassword(token, password, userType) {
     try {
       const endpoint = userType === 'student'
         ? '/api/students/reset-password'
         : '/api/tutors/reset-password';
       
+      console.log('🔐 Password reset API call:', {
+        endpoint,
+        userType,
+        hasToken: !!token,
+        tokenLength: token?.length
+      });
+      
       const response = await apiClient.post(endpoint, { 
-        email, 
         token, 
         password 
       });
+      
+      console.log('✅ Password reset successful:', response);
       return response;
     } catch (error) {
-      console.error('Reset password error:', error);
+      console.error('❌ Reset password error:', error);
       throw error;
     }
   },
